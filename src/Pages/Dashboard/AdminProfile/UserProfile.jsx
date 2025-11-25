@@ -10,7 +10,6 @@ import {
   Avatar,
   message,
 } from "antd";
-import GradientButton from "../../../components/common/GradiantButton";
 import { UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
