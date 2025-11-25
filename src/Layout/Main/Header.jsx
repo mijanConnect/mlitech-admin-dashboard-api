@@ -60,7 +60,7 @@ const Header = ({ toggleSidebar, toggleDrawer }) => {
             <div className="flex flex-row gap-1">
               <p>Hello,</p>{" "}
               <p className="text-[16px] font-semibold">
-                {user?.firstName || ""} {user?.lastName || ""}
+                {user?.firstName || ""}
               </p>
             </div>
             <img

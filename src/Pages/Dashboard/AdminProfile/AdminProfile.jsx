@@ -19,7 +19,7 @@ const AdminProfile = () => {
 
   return (
     <div>
-      <div className=" bg-white rounded-xl  w-[1000px] mx-auto">
+      <div className=" bg-white rounded-xl max-w-[1000px] mx-auto">
         <Tabs defaultActiveKey="1" items={items} />
       </div>
     </div>

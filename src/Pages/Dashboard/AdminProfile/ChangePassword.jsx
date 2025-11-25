@@ -1,17 +1,34 @@
-import { Button, Form, Input } from "antd";
-import React from "react";
-import GradientButton from "../../../components/common/GradiantButton";
+import { Button, Form, Input, message } from "antd";
+import { useChangePasswordMutation } from "../../../redux/apiSlices/authSlice";
 
 const ChangePassword = () => {
   const [form] = Form.useForm();
 
-  const handleChangePassword = (values) => {
-    console.log(values);
+  const [changePassword, { isLoading: isChanging }] =
+    useChangePasswordMutation();
+
+  const handleChangePassword = async (values) => {
+    // Map form fields (snake_case) to backend expected camelCase keys
+    const payload = {
+      currentPassword: values.current_password,
+      newPassword: values.new_password,
+      confirmPassword: values.confirm_password,
+    };
+
+    try {
+      await changePassword(payload).unwrap();
+      message.success("Password updated successfully");
+      form.resetFields();
+    } catch (err) {
+      const errMsg =
+        err?.data?.message || err?.message || "Failed to change password";
+      message.error(errMsg);
+    }
   };
 
   return (
     <div className="">
-      <div className="flex flex-col justify-start pl-20 pr-20 pt-5 pb-10 shadow-xl">
+      <div className="flex flex-col justify-start px-[100px] pt-5 pb-10 shadow-xl">
         <h2 className="text-2xl font-bold mb-5">Update Password</h2>
         <div>
           <Form
@@ -45,7 +62,7 @@ const ChangePassword = () => {
                   type="password"
                   style={{
                     // border: "1px solid #E0E4EC",
-                    height: "40px",
+                    height: "45px",
                     background: "white",
                     borderRadius: "8px",
                     outline: "none",
@@ -63,17 +80,19 @@ const ChangePassword = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please confirm your password!",
+                    message: "Please enter your new password!",
                   },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (
-                        !value ||
-                        getFieldValue("current_password") === value
-                      ) {
+                      if (!value) {
+                        return Promise.reject(
+                          new Error("Please enter your new password!")
+                        );
+                      }
+                      if (getFieldValue("current_password") === value) {
                         return Promise.reject(
                           new Error(
-                            "The new password and current password do not match!"
+                            "New password must be different from current password"
                           )
                         );
                       }
@@ -88,7 +107,7 @@ const ChangePassword = () => {
                   placeholder="Enter password"
                   style={{
                     // border: "1px solid #E0E4EC",
-                    height: "40px",
+                    height: "45px",
                     background: "white",
                     borderRadius: "8px",
                     outline: "none",
@@ -100,7 +119,7 @@ const ChangePassword = () => {
             <div className="mb-[40px] w-[100%]">
               <Form.Item
                 name="confirm_password"
-                label={<p style={{ display: "block" }}>Re-Type Password</p>}
+                label={<p style={{ display: "block" }}>Confirm Password</p>}
                 style={{ marginBottom: 0 }}
                 dependencies={["new_password"]}
                 hasFeedback
@@ -128,7 +147,7 @@ const ChangePassword = () => {
                   placeholder="Enter password"
                   style={{
                     // border: "1px solid #E0E4EC",
-                    height: "40px",
+                    height: "45px",
                     background: "white",
                     borderRadius: "8px",
                     outline: "none",

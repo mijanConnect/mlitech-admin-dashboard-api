@@ -9,43 +9,57 @@ import {
   Upload,
   Avatar,
   message,
+  Spin,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import {
+  useProfileQuery,
+  useUpdateProfileMutation,
+} from "../../../redux/apiSlices/authSlice";
+import { getImageUrl } from "../../../components/common/imageUrl";
 
 const { Option } = Select;
 
 const UserProfile = () => {
   const [form] = Form.useForm();
   const [imageUrl, setImageUrl] = useState(null);
-  const [fileList, setFileList] = useState([]); // State to handle file list
+  const [fileList, setFileList] = useState([]);
 
-  // Dummy data (to be used as the default data)
-  const dummyData = {
-    username: "Md Mijanur Rahman",
-    email: "mijan17634@gmail.com",
-    contact: "+8801234567890",
-    address: "1234 Main St, Springfield, USA",
-    language: "english",
-    profileImage: "https://i.ibb.co.com/Qjf2hxsf/images-2.jpg",
-  };
+  // Fetch profile data using RTK Query
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    refetch,
+  } = useProfileQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
   useEffect(() => {
-    // Set initial values and the profile image if it exists
-    form.setFieldsValue(dummyData);
+    // Set initial values from fetched profile data
+    if (profile) {
+      form.setFieldsValue({
+        username: profile.firstName || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: profile.address || profile.location || "",
+        language: profile.language || "english",
+      });
 
-    // Set the image URL and file list if a profile image exists
-    if (dummyData.profileImage) {
-      setImageUrl(dummyData.profileImage);
-      setFileList([
-        {
-          uid: "-1",
-          name: "profile.jpg",
-          status: "done",
-          url: dummyData.profileImage,
-        },
-      ]);
+      // Set the image URL and file list if a profile image exists
+      if (profile.profile || profile.image || profile.profileImage) {
+        const profileImg =
+          profile.profile || profile.image || profile.profileImage;
+        setImageUrl(profileImg);
+        setFileList([
+          {
+            uid: "-1",
+            name: "profile.jpg",
+            status: "done",
+            url: profileImg,
+          },
+        ]);
+      }
     }
-  }, [form]);
+  }, [profile, form]);
 
   // Clean up blob URLs when component unmounts to prevent memory leaks
   useEffect(() => {
@@ -56,37 +70,32 @@ const UserProfile = () => {
     };
   }, [imageUrl]);
 
-  const onFinish = (values) => {
-    // Get the file object itself, not just the URL
-    const imageFile = fileList.length > 0 ? fileList[0].originFileObj : null;
+  const onFinish = async (values) => {
+    try {
+      // Get the file object itself, not just the URL
+      const imageFile = fileList.length > 0 ? fileList[0].originFileObj : null;
 
-    console.log("Form Values on Submit:", values);
-    console.log("Image File:", imageFile); // Log the actual file object
+      // Create a FormData object for server submission with file
+      const formData = new FormData();
 
-    // Create a FormData object for server submission with file
-    const formData = new FormData();
-    Object.keys(values).forEach((key) => {
-      formData.append(key, values[key]);
-    });
+      formData.append("firstName", values.username);
+      formData.append("phone", values.phone || "");
+      formData.append("address", values.address || "");
+      formData.append("language", values.language || "");
 
-    if (imageFile) {
-      formData.append("profileImage", imageFile);
-    } else if (imageUrl) {
-      // If using existing image (not a new upload)
-      formData.append("profileImageUrl", imageUrl);
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
+      // Call the update mutation
+      await updateProfile(formData).unwrap();
+
+      message.success("Profile Updated Successfully!");
+      refetch(); // Refresh profile data
+    } catch (error) {
+      console.error("Profile update error:", error);
+      message.error(error?.data?.message || "Failed to update profile");
     }
-
-    console.log("FormData created successfully");
-
-    // For displaying in console what would be sent to server
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
-    // Here you would normally send the formData to your API
-    // axios.post('/api/updateProfile', formData)
-
-    message.success("Profile Updated Successfully!");
   };
 
   const handleImageChange = ({ fileList: newFileList }) => {
@@ -136,180 +145,174 @@ const UserProfile = () => {
 
   return (
     <div className="flex justify-center items-center shadow-xl rounded-lg pt-5 pb-12">
-      <Form
-        form={form}
-        layout="vertical"
-        style={{ width: "80%" }}
-        onFinish={onFinish}
-        encType="multipart/form-data"
-      >
-        <div className="flex flex-col gap-5">
-          {/* Profile Image */}
-          <div className="col-span-2 flex justify-start items-center gap-5">
-            <Form.Item style={{ marginBottom: 0 }}>
-              <Upload
-                name="avatar"
-                showUploadList={false}
-                action="/upload" // This will be overridden by the manual form submission
-                onChange={handleImageChange}
-                beforeUpload={beforeUpload}
-                fileList={fileList}
-                listType="picture-card"
-                maxCount={1}
-              >
-                {imageUrl ? (
-                  <Avatar size={100} src={imageUrl} />
-                ) : (
-                  <Avatar size={100} icon={<UploadOutlined />} />
-                )}
-              </Upload>
-            </Form.Item>
-            <h2 className="text-[24px] font-bold">Sabbir Ahmed</h2>
-          </div>
-
-          {/* Username */}
-          <Form.Item
-            name="username"
-            label="Full Name"
-            style={{ marginBottom: 0 }}
-            rules={[{ required: true, message: "Please enter your username" }]}
-          >
-            <Input
-              placeholder="Enter your Username"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                outline: "none",
-              }}
-            />
-          </Form.Item>
-
-          {/* Email (Disabled) */}
-          <Form.Item
-            name="email"
-            label="Email"
-            style={{ marginBottom: 0 }}
-            rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Please enter a valid email" },
-            ]}
-          >
-            <Input
-              placeholder="Enter your Email"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                // border: "1px solid #E0E4EC",
-                outline: "none",
-              }}
-              disabled // Disable the email field
-            />
-          </Form.Item>
-
-          {/* Username */}
-          <Form.Item
-            name="contact"
-            label="Contact Number"
-            style={{ marginBottom: 0 }}
-            rules={[{ required: true, message: "Please enter your username" }]}
-          >
-            <Input
-              placeholder="Enter your Username"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                outline: "none",
-              }}
-            />
-          </Form.Item>
-
-          {/* Address */}
-          {/* <Form.Item
-            name="address"
-            label="Location"
-            style={{ marginBottom: 0 }}
-            rules={[{ required: true, message: "Please enter your address" }]}
-          >
-            <Input
-              placeholder="Enter your Address"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                outline: "none",
-              }}
-            />
-          </Form.Item> */}
-
-          {/* Language */}
-          <Form.Item
-            name="language"
-            label="Location"
-            style={{ marginBottom: 0 }}
-            rules={[{ required: true, message: "Please select your language" }]}
-          >
-            <Select
-              placeholder="Select your Language"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                border: "1px solid #E0E4EC", // Custom border for language
-              }}
-            >
-              <Option value="english">New York</Option>
-              <Option value="french">Manhattan</Option>
-            </Select>
-          </Form.Item>
-
-          {/* Language */}
-          {/* <Form.Item
-            name="language"
-            label="Language"
-            style={{ marginBottom: 0 }}
-            rules={[{ required: true, message: "Please select your language" }]}
-          >
-            <Select
-              placeholder="Select your Language"
-              style={{
-                height: "45px",
-                backgroundColor: "#f7f7f7",
-                borderRadius: "8px",
-                border: "1px solid #E0E4EC", // Custom border for language
-              }}
-            >
-              <Option value="english">English</Option>
-              <Option value="french">French</Option>
-              <Option value="spanish">Spanish</Option>
-            </Select>
-          </Form.Item> */}
-
-          {/* Update Profile Button */}
-          <div className="col-span-2 text-end mt-2">
-            <Form.Item>
-              {/* Option 1: Use standard Ant Design Button */}
-              <Button
-                htmlType="submit"
-                block
-                style={{ height: 40 }}
-                className="bg-primary px-8 py-5 rounded-lg text-white hover:text-secondary text-[17px] font-bold"
-              >
-                Save Changes
-              </Button>
-
-              {/* Option 2: Use GradientButton with onClick handler */}
-              {/* 
-              <GradientButton onClick={handleFormSubmit} block>
-                Update Profile
-              </GradientButton>
-              */}
-            </Form.Item>
-          </div>
+      {isProfileLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Spin size="large" />
         </div>
-      </Form>
+      ) : (
+        <Form
+          form={form}
+          layout="vertical"
+          style={{ width: "80%" }}
+          onFinish={onFinish}
+          encType="multipart/form-data"
+        >
+          <div className="flex flex-col gap-5">
+            {/* Profile Image */}
+            <div className="col-span-2 flex justify-start items-center gap-5">
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Upload
+                  name="avatar"
+                  showUploadList={false}
+                  action="/upload" // This will be overridden by the manual form submission
+                  onChange={handleImageChange}
+                  beforeUpload={beforeUpload}
+                  fileList={fileList}
+                  listType="picture-card"
+                  maxCount={1}
+                >
+                  {imageUrl ? (
+                    <Avatar
+                      className="rounded-[8px]"
+                      size={100}
+                      src={getImageUrl(imageUrl)}
+                    />
+                  ) : (
+                    <Avatar size={100} icon={<UploadOutlined />} />
+                  )}
+                </Upload>
+              </Form.Item>
+              <h2 className="text-[24px] font-bold">
+                {profile?.firstName || ""}
+              </h2>
+            </div>
+
+            {/* Username */}
+            <Form.Item
+              name="username"
+              label="Full Name"
+              style={{ marginBottom: 0 }}
+              rules={[
+                { required: true, message: "Please enter your username" },
+              ]}
+            >
+              <Input
+                placeholder="Enter your Username"
+                style={{
+                  height: "45px",
+                  backgroundColor: "#f7f7f7",
+                  borderRadius: "8px",
+                  outline: "none",
+                }}
+              />
+            </Form.Item>
+
+            {/* Email (Disabled) */}
+            <Form.Item
+              name="email"
+              label="Email"
+              style={{ marginBottom: 0 }}
+              rules={[
+                { required: true, message: "Please enter your email" },
+                { type: "email", message: "Please enter a valid email" },
+              ]}
+            >
+              <Input
+                placeholder="Enter your Email"
+                style={{
+                  height: "45px",
+                  backgroundColor: "#f7f7f7",
+                  borderRadius: "8px",
+                  // border: "1px solid #E0E4EC",
+                  outline: "none",
+                }}
+                disabled // Disable the email field
+              />
+            </Form.Item>
+
+            {/* Username */}
+            <Form.Item
+              name="phone"
+              label="Phone Number"
+              style={{ marginBottom: 0 }}
+              rules={[
+                { required: true, message: "Please enter your phone number" },
+              ]}
+            >
+              <Input
+                placeholder="Enter your Phone Number"
+                style={{
+                  height: "45px",
+                  backgroundColor: "#f7f7f7",
+                  borderRadius: "8px",
+                  outline: "none",
+                }}
+              />
+            </Form.Item>
+
+            {/* Country */}
+            {/* <Form.Item
+              name="country"
+              label="Country"
+              style={{ marginBottom: 0 }}
+              rules={[
+                { required: true, message: "Please select your country" },
+              ]}
+            >
+              <Select
+                placeholder="Select your Country"
+                style={{
+                  height: "45px",
+                  backgroundColor: "#f7f7f7",
+                  borderRadius: "8px",
+                  border: "1px solid #E0E4EC", // Custom border for language
+                }}
+              >
+                <Option value="english">USA</Option>
+                <Option value="french">Dubai</Option>
+              </Select>
+            </Form.Item> */}
+
+            {/* City */}
+            {/* <Form.Item
+              name="city"
+              label="City"
+              style={{ marginBottom: 0 }}
+              rules={[{ required: true, message: "Please select your city" }]}
+            >
+              <Select
+                placeholder="Select your City"
+                style={{
+                  height: "45px",
+                  backgroundColor: "#f7f7f7",
+                  borderRadius: "8px",
+                  border: "1px solid #E0E4EC", // Custom border for language
+                }}
+              >
+                <Option value="english">New York</Option>
+                <Option value="french">Manhattan</Option>
+              </Select>
+            </Form.Item> */}
+
+            {/* Update Profile Button */}
+            <div className="col-span-2 text-end mt-2">
+              <Form.Item>
+                {/* Option 1: Use standard Ant Design Button */}
+                <Button
+                  htmlType="submit"
+                  block
+                  loading={isUpdating}
+                  disabled={isUpdating}
+                  style={{ height: 40 }}
+                  className="bg-primary px-8 py-5 rounded-lg text-white hover:text-secondary text-[17px] font-bold"
+                >
+                  Save Changes
+                </Button>
+              </Form.Item>
+            </div>
+          </div>
+        </Form>
+      )}
     </div>
   );
 };
