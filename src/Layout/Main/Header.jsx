@@ -1,25 +1,32 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { FaRegBell } from "react-icons/fa6";
 import { Badge, Button, Dropdown, Menu, Modal } from "antd";
-import { IoIosLogOut } from "react-icons/io";
-import Avatar from "../../assets/avatar.png";
+import { useState } from "react";
+import { FaRegBell } from "react-icons/fa6";
+import { Link, useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../components/common/imageUrl";
+import { useUser } from "../../provider/User";
+import { imageUrl } from "../../redux/api/baseApi";
 
-const Header = ({ toggleSidebar, isMobile }) => {
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
+const Header = ({ toggleSidebar, toggleDrawer }) => {
+  const { user } = useUser();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const src = user?.image?.startsWith("https")
+    ? user?.image
+    : `${imageUrl}/${user?.image}`;
 
   const showLogoutConfirm = () => {
-    setIsLogoutModalOpen(true); 
+    setIsLogoutModalOpen(true); // Show the confirmation modal
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsLogoutModalOpen(false); 
-    window.location.href = "/auth/login"; 
+    setIsLogoutModalOpen(false); // Close the modal
+    navigate("/auth/login");
   };
 
   const handleCancelLogout = () => {
-    setIsLogoutModalOpen(false); 
+    setIsLogoutModalOpen(false); // Close the confirmation modal
   };
 
   const menu = (
@@ -39,48 +46,42 @@ const Header = ({ toggleSidebar, isMobile }) => {
   );
 
   return (
-    <div className="flex items-center justify-between gap-5 w-full rounded-md px-8 shadow-sm py-2">
-      <div className="flex items-center gap-4">
-        {/* Mobile Sidebar Toggle */}
-        {isMobile && (
-          <button
-            onClick={toggleSidebar}
-            className="text-xl text-gray-700 p-2 rounded-md hover:bg-gray-100"
-          >
-            &#9776;
-          </button>
-        )}
-        <h2 className="font-bold text-xl text-secondary">
-          Super Admin Dashboard
-        </h2>
+    <div className="flex items-center justify-between gap-5 w-full px-6 rounded-md shadow-sm py-2 bg-white border-b border-gray-200">
+      <div className="py-2">
+        <h2 className="font-bold text-xl text-secondary">Admin Dashboard</h2>
+        {/* <p className="text-[12px] font-normal text-secondary mt-1">
+          36 East 8th Street, New York, NY 10003, United States.
+        </p> */}
       </div>
-
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-3">
         {/* Profile Icon with Dropdown Menu */}
         <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
           <div className="flex items-center gap-3 cursor-pointer">
             <div className="flex flex-row gap-1">
-              <p>Hello,</p> <p className="text-[16px] font-semibold">Sabbir</p>
+              <p>Hello,</p>{" "}
+              <p className="text-[16px] font-semibold">
+                {user?.firstName || ""} {user?.lastName || ""}
+              </p>
             </div>
             <img
               style={{
                 clipPath: "circle()",
                 width: 45,
                 height: 45,
+                objectFit: "cover",
               }}
-              src={Avatar}
+              src={getImageUrl(user?.profile)}
               alt="profile-pic"
               className="clip"
             />
           </div>
         </Dropdown>
-
         {/* Notification Icon */}
-        <Link to="/notification" className="h-fit mt-[10px]">
+        {/* <Link to="/notification" className="h-fit mt-[10px]">
           <Badge count={5} backgroundColor="#3FC7EE">
-            <FaRegBell color="#198248" size={24} />
+            <FaRegBell color="#b91c1c" size={24} />
           </Badge>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Logout Confirmation Modal */}

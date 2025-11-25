@@ -1,28 +1,33 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useProfileQuery } from "../redux/apiSlices/authSlice";
+
 export const UserContext = React.createContext(null);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const profile = {
-    firstName: "Test",
-    lastName: "User",
-    email: "mithilakhan082@gmail.com",
-    mobileNumber: "01812038369",
-    location: "Dhaka, Bangladesh",
-    image:
-      "https://avatars.design/wp-content/uploads/2021/02/corporate-avatars-TN-1.jpg",
-  };
+  // Fetch profile only if there's a token in localStorage
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const {
+    data: profile,
+    isLoading,
+    isError,
+    refetch,
+  } = useProfileQuery(undefined, {
+    skip: !token, // Skip query if no token
+  });
 
   useEffect(() => {
-    if (profile && !user) {
-     
+    if (profile && !isLoading && !isError) {
       setUser(profile);
+    } else if (isError) {
+      setUser(null);
     }
-  }, [profile, user]); 
+  }, [profile, isLoading, isError]);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, isLoading, refetch }}>
       {children}
     </UserContext.Provider>
   );
