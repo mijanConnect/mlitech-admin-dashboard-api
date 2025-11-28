@@ -21,8 +21,8 @@ const MerchantTableColumn = ({
     { title: "SL", dataIndex: "id", key: "id", align: "center" },
     {
       title: "Merchant Card ID",
-      dataIndex: "MarchantID",
-      key: "MarchantID",
+      dataIndex: "merchantCardId",
+      key: "merchantCardId",
       align: "center",
     },
     {
@@ -44,8 +44,18 @@ const MerchantTableColumn = ({
       key: "location",
       align: "center",
     },
-    { title: "Sales Rep", dataIndex: "name", key: "salesRep", align: "center" },
-    { title: "Total Sales", dataIndex: "sales", key: "sales", align: "center" },
+    {
+      title: "Sales Rep",
+      dataIndex: "salesRep",
+      key: "salesRep",
+      align: "center",
+    },
+    {
+      title: "Total Sales",
+      dataIndex: "totalSales",
+      key: "totalSales",
+      align: "center",
+    },
     {
       title: "Total Points Earned",
       dataIndex: "totalPointsEarned",
@@ -73,12 +83,12 @@ const MerchantTableColumn = ({
     { title: "Status", dataIndex: "status", key: "status", align: "center" },
     {
       title: "Ratings",
-      dataIndex: "feedback",
-      key: "feedback",
+      dataIndex: "ratings",
+      key: "ratings",
       align: "center",
       render: (_, record) => (
         <Tooltip title="Customer Ratings">
-          <Rate disabled value={record.feedback} style={{ fontSize: 16 }} />
+          <Rate disabled value={record.ratings} style={{ fontSize: 16 }} />
         </Tooltip>
       ),
     },
