@@ -14,16 +14,14 @@ import { ConfigProvider } from "antd";
 
 i18next.init({
   interpolation: {
-    escapeValue: false, // not needed for react as it escapes by default
+    escapeValue: false,
   },
   lng: "en",
   resources: {
     en: {
-      // Use "en" instead of "english"
       global: global_en,
     },
     es: {
-      // Use "es" instead of "spanish"
       global: global_es,
     },
   },
@@ -35,17 +33,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       theme={{
         token: {
           colorPrimary: "#3fae6a",
-          colorBorder: "#3fae6a", // Default border color
-          // colorText: "rgba(0, 0, 0, 0.88)", // Default text color
-          // colorTextPlaceholder: "#bfbfbf", // Placeholder color
-          // colorBgContainer: "#ffffff", // Background color
-          // controlOutline: "rgba(232, 80, 91, 0.1)", // Focus outline color (based on your primary color)
+          colorBorder: "#3fae6a",
         },
         components: {
           Input: {
-            activeBorderColor: "#3fae6a", // Active border color
-            hoverBorderColor: "#3fae6a", // Hover border color
-            activeShadow: "0 0 0 2px rgba(232, 80, 91, 0.1)", // Focus shadow
+            activeBorderColor: "#3fae6a",
+            hoverBorderColor: "#3fae6a",
+            activeShadow: "0 0 0 2px rgba(232, 80, 91, 0.1)",
           },
         },
         Button: {

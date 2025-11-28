@@ -6,7 +6,6 @@ export const UserContext = React.createContext(null);
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Fetch profile only if there's a token in localStorage
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const {
@@ -15,7 +14,7 @@ export const UserProvider = ({ children }) => {
     isError,
     refetch,
   } = useProfileQuery(undefined, {
-    skip: !token, // Skip query if no token
+    skip: !token,
   });
 
   useEffect(() => {

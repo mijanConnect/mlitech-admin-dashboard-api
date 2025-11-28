@@ -1,5 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
-import bgImage from "../../assets/bgImage.png";
+import { Outlet, useLocation } from "react-router-dom";
 import loginImage from "../../assets/sideimage.png";
 import forgotImage from "../../assets/forgot-img.png";
 import verifyEmail from "../../assets/checkEmail.png";
@@ -75,4 +74,3 @@ const Auth = () => {
 };
 
 export default Auth;
-

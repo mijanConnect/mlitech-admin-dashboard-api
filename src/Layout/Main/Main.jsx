@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
@@ -46,7 +46,6 @@ const Main = () => {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header with toggle button */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
-
         <div className="flex-1 px-8 py-8 overflow-auto">
           <Outlet />
         </div>

@@ -83,24 +83,6 @@
   padding: 12px;
 }
 
-/* .custom-table .ant-table-tbody > tr > td {
-  border-bottom: 1px solid #ddd;
-  padding: 12px 16px !important;
-  text-align: center !important;
-  font-size: 12px !important;
-  font-weight: 400 !important;
-}
-
-.custom-table .ant-table-thead > tr > th {
-  border-bottom: 2px solid #3fae6a;
-}
-
-.custom-table .ant-table-thead > tr > th {
-  background-color: #3fae6a !important;
-  color: white !important;
-  border-bottom: 2px solid #ddd;
-} */
-
 /* Hide number input arrows in WebKit browsers */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -299,11 +281,7 @@ select {
 
 /* Same design as your input fields */
 .custom-select .ant-select-selector {
-  /* height: 40px !important;
-  border: 1px solid #3fae6a !important; */
   border-radius: 200px !important;
-  /* display: flex;
-  align-items: center; */
   padding: 12px !important;
 }
 
@@ -311,15 +289,6 @@ select {
 .custom-dropdown .ant-select-item {
   border-radius: 8px;
 }
-
-/* .mli-custom-label{
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.mli-custom-select{
-  height: 40px;
-} */
 
 .ant-form-item-label > label {
   font-size: 20px;

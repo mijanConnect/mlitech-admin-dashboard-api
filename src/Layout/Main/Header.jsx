@@ -4,7 +4,6 @@ import { FaRegBell } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../components/common/imageUrl";
 import { useUser } from "../../provider/User";
-import { imageUrl } from "../../redux/api/baseApi";
 
 const Header = ({ toggleSidebar, toggleDrawer }) => {
   const { user } = useUser();
@@ -13,7 +12,7 @@ const Header = ({ toggleSidebar, toggleDrawer }) => {
 
   const src = user?.image?.startsWith("https")
     ? user?.image
-    : `${imageUrl}/${user?.image}`;
+    : getImageUrl(user?.image);
 
   const showLogoutConfirm = () => {
     setIsLogoutModalOpen(true); // Show the confirmation modal

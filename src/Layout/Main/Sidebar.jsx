@@ -1,18 +1,12 @@
 import { Menu, Modal } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoIosLogOut } from "react-icons/io";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import {
   Dashboard,
   Marchant,
-  SalesRepsManagement,
   Settings,
-  RetailersManagement,
-  InventoryManagement,
-  LoyaltyProgram,
   SubscriptionManagement,
-  OrderManagement,
   People,
   PromotionManagement,
   SalesRep,
