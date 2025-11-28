@@ -175,7 +175,7 @@ const CustomerManagement = () => {
         <div className="flex justify-between items-center mb-4 ">
           <div>
             <h1 className="text-[24px] font-bold">Customer Profile</h1>
-            <p className="text-[16px] font-normal mt-2">
+            <p className="text-[16px] font-normal">
               Seamlessly manage customer profiles and interactions.
             </p>
           </div>
