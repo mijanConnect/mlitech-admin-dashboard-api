@@ -1,37 +1,9 @@
-import { Switch, Table, Tooltip } from "antd";
+import { Tooltip } from "antd";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
+import { Switch } from "antd";
 import Swal from "sweetalert2";
-
-const tableComponents = {
-  header: {
-    row: (props) => (
-      <tr
-        {...props}
-        style={{
-          backgroundColor: "#f0f5f9",
-          height: "50px",
-          color: "secondary",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-    cell: (props) => (
-      <th
-        {...props}
-        style={{
-          color: "secondary",
-          fontWeight: "bold",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-  },
-};
+import ReusableTable from "../../common/Table";
 
 const CustomerTable = ({
   data,
@@ -44,7 +16,7 @@ const CustomerTable = ({
   pagination,
   onPaginationChange,
 }) => {
-  const columnsWithActions = [
+  const baseColumns = [
     { title: "SL", dataIndex: "id", key: "id", align: "center" },
     {
       title: "Customer ID",
@@ -191,28 +163,15 @@ const CustomerTable = ({
   ];
 
   return (
-    <div className="overflow-x-auto">
-      <Table
-        dataSource={data}
-        columns={columnsWithActions}
-        pagination={{
-          pageSize: pagination?.pageSize || 10,
-          total: pagination?.total || 0,
-          current: pagination?.current || 1,
-          onChange: onPaginationChange,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} items`,
-          style: { marginRight: "8px" },
-        }}
-        bordered={false}
-        size="small"
-        rowClassName="custom-row"
-        components={tableComponents}
-        className="custom-table [&_.ant-pagination]:flex [&_.ant-pagination]:justify-end"
-        scroll={{ x: "max-content" }}
-        loading={isLoading || isFetching}
-      />
-    </div>
+    <ReusableTable
+      data={data}
+      columns={baseColumns}
+      isLoading={isLoading}
+      isFetching={isFetching}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      rowKey="key"
+    />
   );
 };
 

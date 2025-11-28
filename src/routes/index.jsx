@@ -11,7 +11,6 @@ import VerifyOtp from "../Pages/Auth/VerifyOtp";
 import NotFound from "../NotFound";
 import Notifications from "../Pages/Dashboard/Notifications";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
-import SaleRepsManagement from "../Pages/Dashboard/SaleRepsManagement";
 import LoyaltyProgram from "../Pages/Dashboard/LoyaltyProgram";
 import PackagesPlans from "../Pages/Dashboard/Subscription";
 import Contact from "../Pages/Dashboard/Contact";
@@ -26,6 +25,7 @@ import LoginCredentials from "../components/loginCredentials/LoginCredentials";
 import ReportingAnalytics from "../components/reportingAnalytics/ReportingAnalytics";
 import PushNotifications from "../components/pushNotifications/PushNotifications";
 import PrivateRoute from "./ProtectedRoute";
+import MerchantManagement from "../components/MerchantManagement/MerchantManagement";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/merchantManagement",
-        element: <SaleRepsManagement />,
+        element: <MerchantManagement />,
       },
       {
         path: "/customerManagement",

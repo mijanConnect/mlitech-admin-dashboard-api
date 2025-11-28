@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import EditModal from "./components/EditModal";
 import ViewModal from "./components/ViewModal";
-import CustomerTable from "./components/Table";
+import CustomerTable from "./components/TableColumn";
 import { useGetCustomerProfileQuery } from "../../redux/apiSlices/customerSlice";
 
 const CustomerManagement = () => {
