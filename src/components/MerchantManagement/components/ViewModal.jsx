@@ -1,7 +1,7 @@
 import { Modal, Table } from "antd";
-import MarchantIcon from "../../../assets/marchant.png"; // Adjust path if needed
+import MarchantIcon from "../../../assets/marchant.png";
 
-const columns2 = [
+const detailsColumns = [
   {
     title: "SL",
     dataIndex: "id",
@@ -9,22 +9,22 @@ const columns2 = [
   },
   {
     title: "Subscription Type",
-    dataIndex: "subscriptionType", // Assuming you have 'subscriptionType' field in your data
+    dataIndex: "subscriptionType",
     key: "subscriptionType",
   },
   {
     title: "Date",
-    dataIndex: "lastPaymentDate", // Ensure your data includes a 'date' field
+    dataIndex: "lastPaymentDate",
     key: "lastPaymentDate",
   },
   {
     title: "Expire Date",
-    dataIndex: "expiryDate", // Ensure your data includes an 'expiryDate' field
+    dataIndex: "expiryDate",
     key: "expiryDate",
   },
   {
     title: "Total Revenue",
-    dataIndex: "totalRevenue", // Ensure your data includes a 'totalRevenue' field
+    dataIndex: "totalRevenue",
     key: "totalRevenue",
   },
   {
@@ -55,9 +55,9 @@ const ViewModal = ({ visible, record, onCancel }) => {
       <div className="flex flex-col">
         <div className="flex flex-row items-center justify-between gap-3 mt-8 mb-8">
           <img
-            src={MarchantIcon} // Use the image URL from the selectedRecord
+            src={MarchantIcon}
             alt={record.name}
-            className="w-214 h-214 rounded-full" // Fixed width and height for the image
+            className="w-214 h-214 rounded-full"
           />
           <div className="flex flex-col gap-2 w-full border border-primary rounded-md p-4">
             <p className="text-[22px] font-bold text-primary">
@@ -131,8 +131,8 @@ const ViewModal = ({ visible, record, onCancel }) => {
           </div>
         </div>
         <Table
-          columns={columns2}
-          dataSource={[record]} // Pass the current record data to the table
+          columns={detailsColumns}
+          dataSource={[record]}
           pagination={false}
           rowKey="id"
           className="mt-6"

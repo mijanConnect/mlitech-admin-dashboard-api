@@ -6,6 +6,10 @@ import ReusableTable from "../../common/CustomTable";
 
 const MerchantTableColumn = ({
   data,
+  isLoading,
+  isFetching,
+  pagination,
+  onPaginationChange,
   onView,
   onEdit,
   onDelete,
@@ -196,7 +200,17 @@ const MerchantTableColumn = ({
     },
   ];
 
-  return <ReusableTable data={data} columns={columnsWithActions} rowKey="id" />;
+  return (
+    <ReusableTable
+      data={data}
+      isLoading={isLoading}
+      isFetching={isFetching}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      columns={columnsWithActions}
+      rowKey="id"
+    />
+  );
 };
 
 export default MerchantTableColumn;

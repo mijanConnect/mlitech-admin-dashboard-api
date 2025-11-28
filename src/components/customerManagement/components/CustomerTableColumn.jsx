@@ -9,12 +9,12 @@ const CustomerTableColumn = ({
   data,
   isLoading,
   isFetching,
+  pagination,
+  onPaginationChange,
   onView,
   onEdit,
   onDelete,
   onStatusChange,
-  pagination,
-  onPaginationChange,
 }) => {
   const baseColumns = [
     { title: "SL", dataIndex: "id", key: "id", align: "center" },

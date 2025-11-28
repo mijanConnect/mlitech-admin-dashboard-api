@@ -203,11 +203,11 @@ const CustomerManagement = () => {
         data={tableData}
         isLoading={isLoading}
         isFetching={isFetching}
+        pagination={paginationData}
         onView={showViewModal}
         onEdit={showEditModal}
         onDelete={handleDelete}
         onStatusChange={handleStatusChange}
-        pagination={paginationData}
         onPaginationChange={handlePaginationChange}
       />
 

@@ -1,104 +1,75 @@
 import { Button, Form, Input, message } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import AddEditModal from "./components/AddEditModal";
 import ViewModal from "./components/ViewModal";
-import MerchantTable from "./components/MerchantTableColumn";
+import { useGetMerchantProfileQuery } from "../../redux/apiSlices/merchantSlic";
+import MerchantTableColumn from "./components/MerchantTableColumn";
 
 const MerchantManagement = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      MarchantID: 55,
-      totalPointsEarned: 1200,
-      totalPointsRedeemed: 300,
-      totalPointsPending: 150,
-      totalVisits: 45,
-      name: "Alice Johnson",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "example@email.com",
-      phone: "+1234567890",
-      businessName: "Alice's Store",
-      website: "https://www.alicesstore.com",
-      address: "123 Main St, New York, NY",
-      servicesOffered: "Retail, E-commerce",
-      tier: "Gold",
-      subscriptionType: "Premium",
-      lastPaymentDate: "2025-09-01",
-      expiryDate: "2026-09-01",
-      totalRevenue: "$10,000",
-      retailer: 5,
-      sales: "$300",
-      status: "Active",
-      location: "New York",
-      feedback: 4,
-    },
-    {
-      id: 2,
-      MarchantID: 59,
-      totalPointsEarned: 800,
-      totalPointsRedeemed: 200,
-      totalPointsPending: 75,
-      totalVisits: 30,
-      name: "John Doe",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "john@email.com",
-      phone: "+9876543210",
-      businessName: "John's Shop",
-      website: "https://www.johnsshop.com",
-      address: "456 Oak St, California, CA",
-      servicesOffered: "Fashion, Retail",
-      tier: "Silver",
-      subscriptionType: "Basic",
-      lastPaymentDate: "2025-07-15",
-      expiryDate: "2026-07-15",
-      totalRevenue: "$5,000",
-      retailer: 3,
-      sales: "$500",
-      status: "Inactive",
-      location: "California",
-      feedback: 3,
-    },
-    {
-      id: 3,
-      MarchantID: 85,
-      totalPointsEarned: 1500,
-      totalPointsRedeemed: 500,
-      totalPointsPending: 200,
-      totalVisits: 60,
-      name: "Jane Smith",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "jane@email.com",
-      phone: "+1112223333",
-      businessName: "Jane's Boutique",
-      website: "https://www.janesboutique.com",
-      address: "789 Pine St, Texas, TX",
-      servicesOffered: "Clothing, Accessories",
-      tier: "Platinum",
-      subscriptionType: "Premium",
-      lastPaymentDate: "2025-08-10",
-      expiryDate: "2026-08-10",
-      totalRevenue: "$15,000",
-      retailer: 4,
-      sales: "$700",
-      status: "Active",
-      location: "Texas",
-      feedback: 5,
-    },
-  ]);
-
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const queryParams = [
+    { name: "page", value: page },
+    { name: "limit", value: limit },
+  ];
+  if (searchText.trim()) {
+    queryParams.push({ name: "searchTerm", value: searchText.trim() });
+  }
+
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetMerchantProfileQuery(queryParams);
+
+  console.log(response);
+
+  const tableData = useMemo(() => {
+    const items = response?.data || [];
+    return items.map((item, index) => ({
+      key: item._id,
+      id: index + 1 + (page - 1) * limit,
+      customerId: item.customerId || "-",
+      customerName: item.firstName || "-",
+      subscription: item.subscription || "-",
+      tier: item.tier || "-",
+      phone: item.phone || "-",
+      email: item.email || "-",
+      location: item.location || "-",
+      refdRep: item.refdRep || "-",
+      totalSales: item.totalSales || 0,
+      status: item.status === "active" ? "Active" : "Inactive",
+      raw: item,
+    }));
+  }, [response, page, limit]);
+
+  const paginationData = {
+    pageSize: limit,
+    total: response?.pagination?.total || 0,
+    current: page,
+  };
+
+  const handlePaginationChange = (newPage, newPageSize) => {
+    setPage(newPage);
+    if (newPageSize !== limit) {
+      setLimit(newPageSize);
+    }
+  };
 
   // View
   const showViewModal = (record) => {
     setSelectedRecord(record);
-    setIsViewModalVisible(true); // ✅ show view only when this is true
+    setIsViewModalVisible(true);
   };
 
   // Normalize date fields (Dayjs -> "YYYY-MM-DD")
@@ -189,81 +160,6 @@ const MerchantManagement = () => {
     }
   };
 
-  const filteredData = data.filter((item) => {
-    const idMatch = String(item.MarchantID || "").includes(searchText);
-    const businessMatch = (item.businessName || "")
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    const phoneMatch = (item.phone || "")
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    const emailMatch = (item.email || "")
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    const locationMatch = (item.location || "")
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-    return (
-      idMatch || businessMatch || phoneMatch || emailMatch || locationMatch
-    );
-  });
-
-  const columns = [
-    { title: "SL", dataIndex: "id", key: "id", align: "center" },
-    {
-      title: "Merchant Card ID",
-      dataIndex: "MarchantID",
-      key: "MarchantID",
-      align: "center",
-    },
-    {
-      title: "Business Name",
-      dataIndex: "businessName",
-      key: "businessName",
-      align: "center",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "phone",
-      key: "phone",
-      align: "center",
-    },
-    { title: "Email", dataIndex: "email", key: "email", align: "center" },
-    {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
-      align: "center",
-    },
-    { title: "Sales Rep", dataIndex: "name", key: "salesRep", align: "center" },
-    { title: "Total Sales", dataIndex: "sales", key: "sales", align: "center" },
-    {
-      title: "Total Points Earned",
-      dataIndex: "totalPointsEarned",
-      key: "totalPointsEarned",
-      align: "center",
-    },
-    {
-      title: "Total Points Redeemed",
-      dataIndex: "totalPointsRedeemed",
-      key: "totalPointsRedeemed",
-      align: "center",
-    },
-    {
-      title: "Total Points Pending",
-      dataIndex: "totalPointsPending",
-      key: "totalPointsPending",
-      align: "center",
-    },
-    {
-      title: "Total Visits",
-      dataIndex: "totalVisits",
-      key: "totalVisits",
-      align: "center",
-    },
-    { title: "Status", dataIndex: "status", key: "status", align: "center" },
-  ];
-
   const handleDelete = (recordId) => {
     setData((prev) => prev.filter((item) => item.id !== recordId));
   };
@@ -313,7 +209,7 @@ const MerchantManagement = () => {
       <div className="flex justify-between md:flex-row flex-col md:items-end items-start gap-4 mb-6">
         <div>
           <h1 className="text-[24px] font-bold">Merchant Management</h1>
-          <p className="text-[16px] font-normal mt-2">
+          <p className="text-[16px] font-normal">
             Effortlessly manage your merchants and track performance.
           </p>
         </div>
@@ -338,9 +234,12 @@ const MerchantManagement = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <MerchantTable
-          data={filteredData}
-          columns={columns}
+        <MerchantTableColumn
+          data={tableData}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          pagination={paginationData}
+          onPaginationChange={handlePaginationChange}
           onView={showViewModal}
           onEdit={showAddOrEditModal}
           onDelete={handleDelete}

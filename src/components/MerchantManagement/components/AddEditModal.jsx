@@ -1,7 +1,7 @@
 import { DatePicker, Form, Input, Modal, Select } from "antd";
 
 const AddEditModal = ({
-  visible, // parent passes a boolean
+  visible,
   selectedRecord,
   form,
   handleAddMerchant,
