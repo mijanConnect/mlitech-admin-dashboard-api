@@ -13,7 +13,6 @@ import Notifications from "../Pages/Dashboard/Notifications";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 import SaleRepsManagement from "../Pages/Dashboard/SaleRepsManagement";
 import LoyaltyProgram from "../Pages/Dashboard/LoyaltyProgram";
-import SubscriptionTable from "../components/subscriber/SubscriberTable";
 import PackagesPlans from "../Pages/Dashboard/Subscription";
 import Contact from "../Pages/Dashboard/Contact";
 import ResetSuccess from "../Pages/Auth/ResetSuccess";
@@ -55,10 +54,6 @@ const router = createBrowserRouter([
         element: <TierSystem />,
       },
       {
-        path: "/subsciption",
-        element: <SubscriptionTable />,
-      },
-      {
         path: "/promotionManagement",
         element: <PromotionManagement />,
       },
@@ -86,7 +81,6 @@ const router = createBrowserRouter([
         path: "/loyaltyProgram",
         element: <LoyaltyProgram />,
       },
-
       {
         path: "/subscription",
         element: <PackagesPlans />,

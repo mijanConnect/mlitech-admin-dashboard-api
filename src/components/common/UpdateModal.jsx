@@ -108,9 +108,7 @@ const UpdateModal = ({ isOpen, onClose, onSave, userData, editingId }) => {
           <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">
             Cancel
           </button>
-          <GradientButton
-            onClick={handleSubmit}
-          >
+          <GradientButton onClick={handleSubmit}>
             {isEditMode ? "Update" : "Add"}
           </GradientButton>
         </div>
