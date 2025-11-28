@@ -5,8 +5,9 @@ import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import EditModal from "./components/EditModal";
 import ViewModal from "./components/ViewModal";
-import CustomerTable from "./components/TableColumn";
+import CustomerTable from "./components/CustomerTableColumn";
 import { useGetCustomerProfileQuery } from "../../redux/apiSlices/customerSlice";
+import CustomerTableColumn from "./components/CustomerTableColumn";
 
 const CustomerManagement = () => {
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
@@ -198,7 +199,7 @@ const CustomerManagement = () => {
         </div>
       </div>
 
-      <CustomerTable
+      <CustomerTableColumn
         data={tableData}
         isLoading={isLoading}
         isFetching={isFetching}

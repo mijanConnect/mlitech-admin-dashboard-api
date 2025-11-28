@@ -1,12 +1,11 @@
-import { Rate, Switch, Table, Tooltip } from "antd";
+import { Rate, Switch, Tooltip } from "antd";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
-import { message } from "antd";
+import ReusableTable from "../../common/CustomTable";
 
-const MerchantTable = ({
+const MerchantTableColumn = ({
   data,
-  columns,
   onView,
   onEdit,
   onDelete,
@@ -14,38 +13,60 @@ const MerchantTable = ({
   onApprove,
   onReject,
 }) => {
-  const tableComponents = {
-    header: {
-      row: (props) => (
-        <tr
-          {...props}
-          style={{
-            backgroundColor: "#f0f5f9",
-            height: "50px",
-            color: "secondary",
-            fontSize: "18px",
-            textAlign: "center",
-            padding: "12px",
-          }}
-        />
-      ),
-      cell: (props) => (
-        <th
-          {...props}
-          style={{
-            color: "secondary",
-            fontWeight: "bold",
-            fontSize: "18px",
-            textAlign: "center",
-            padding: "12px",
-          }}
-        />
-      ),
-    },
-  };
-
   const columnsWithActions = [
-    ...columns,
+    { title: "SL", dataIndex: "id", key: "id", align: "center" },
+    {
+      title: "Merchant Card ID",
+      dataIndex: "MarchantID",
+      key: "MarchantID",
+      align: "center",
+    },
+    {
+      title: "Business Name",
+      dataIndex: "businessName",
+      key: "businessName",
+      align: "center",
+    },
+    {
+      title: "Phone Number",
+      dataIndex: "phone",
+      key: "phone",
+      align: "center",
+    },
+    { title: "Email", dataIndex: "email", key: "email", align: "center" },
+    {
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+      align: "center",
+    },
+    { title: "Sales Rep", dataIndex: "name", key: "salesRep", align: "center" },
+    { title: "Total Sales", dataIndex: "sales", key: "sales", align: "center" },
+    {
+      title: "Total Points Earned",
+      dataIndex: "totalPointsEarned",
+      key: "totalPointsEarned",
+      align: "center",
+    },
+    {
+      title: "Total Points Redeemed",
+      dataIndex: "totalPointsRedeemed",
+      key: "totalPointsRedeemed",
+      align: "center",
+    },
+    {
+      title: "Total Points Pending",
+      dataIndex: "totalPointsPending",
+      key: "totalPointsPending",
+      align: "center",
+    },
+    {
+      title: "Total Visits",
+      dataIndex: "totalVisits",
+      key: "totalVisits",
+      align: "center",
+    },
+    { title: "Status", dataIndex: "status", key: "status", align: "center" },
     {
       title: "Ratings",
       dataIndex: "feedback",
@@ -175,22 +196,7 @@ const MerchantTable = ({
     },
   ];
 
-  return (
-    <div className="overflow-x-auto">
-      <Table
-        dataSource={data}
-        columns={columnsWithActions}
-        pagination={{ pageSize: 10 }}
-        bordered={false}
-        size="small"
-        rowClassName="custom-row"
-        components={tableComponents}
-        className="custom-table [&_.ant-pagination]:flex [&_.ant-pagination]:justify-end [&_.ant-pagination]:mr-4"
-        scroll={{ x: "max-content" }}
-        rowKey="id"
-      />
-    </div>
-  );
+  return <ReusableTable data={data} columns={columnsWithActions} rowKey="id" />;
 };
 
-export default MerchantTable;
+export default MerchantTableColumn;

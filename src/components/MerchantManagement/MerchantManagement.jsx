@@ -4,7 +4,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import AddEditModal from "./components/AddEditModal";
 import ViewModal from "./components/ViewModal";
-import MerchantTable from "./components/Table";
+import MerchantTable from "./components/MerchantTableColumn";
 
 const MerchantManagement = () => {
   const [data, setData] = useState([

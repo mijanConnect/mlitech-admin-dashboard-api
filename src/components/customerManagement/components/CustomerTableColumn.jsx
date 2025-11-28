@@ -3,9 +3,9 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import { Switch } from "antd";
 import Swal from "sweetalert2";
-import ReusableTable from "../../common/Table";
+import ReusableTable from "../../common/CustomTable";
 
-const CustomerTable = ({
+const CustomerTableColumn = ({
   data,
   isLoading,
   isFetching,
@@ -175,4 +175,4 @@ const CustomerTable = ({
   );
 };
 
-export default CustomerTable;
+export default CustomerTableColumn;
