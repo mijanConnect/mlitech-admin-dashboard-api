@@ -47,6 +47,8 @@ const PrivateRoute = ({ children }) => {
     skip: !localStorage.getItem("token"), // don't fetch if no token
   });
 
+  console.log(profile)
+
   if (isLoading) {
     return <div>Loading...</div>;
   }

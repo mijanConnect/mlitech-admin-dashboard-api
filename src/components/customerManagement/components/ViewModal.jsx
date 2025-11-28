@@ -6,7 +6,7 @@ const ViewModal = ({ visible, onCancel, selectedRecord, columns2, data }) => {
     <Modal
       visible={visible}
       onCancel={onCancel}
-      width={700}
+      width={800}
       footer={false}
       title="Customer Details"
     >
@@ -60,8 +60,6 @@ const ViewModal = ({ visible, onCancel, selectedRecord, columns2, data }) => {
               </p>
             </div>
           </div>
-
-          {/* Table (assuming this shows the customer's order history or other details) */}
           <Table
             columns={columns2}
             dataSource={data}

@@ -64,7 +64,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       window.location.replace("/auth/login");
     }
   }
-
   return result;
 };
 
@@ -74,6 +73,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Profile", "InitialSubmission"],
+  tagTypes: ["Profile", "Customer"],
   endpoints: () => ({}),
 });

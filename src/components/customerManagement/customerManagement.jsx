@@ -1,148 +1,77 @@
 "use client";
-import { Button, Form, Input, Modal, Switch, Table, Tooltip } from "antd";
+import { Button, Form, Input } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import { IoEyeSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import EditModal from "./components/EditModal";
 import ViewModal from "./components/ViewModal";
-
-const components = {
-  header: {
-    row: (props) => (
-      <tr
-        {...props}
-        style={{
-          backgroundColor: "#f0f5f9",
-          height: "50px",
-          color: "secondary",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-    cell: (props) => (
-      <th
-        {...props}
-        style={{
-          color: "secondary",
-          fontWeight: "bold",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-  },
-};
+import CustomerTable from "./components/Table";
+import { useGetCustomerProfileQuery } from "../../redux/apiSlices/customerSlice";
 
 const CustomerManagement = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      name: "Alice Johnson",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "example@email.com",
-      retailer: 5,
-      sales: "300",
-      status: "Active",
-      phone: "+1234567890",
-      location: "New York",
-      businessName: "Alice's Store",
-      subscription: "Premium", // Subscription Type
-      tier: "Gold",
-      date: "2025-01-15", // Date
-      reward: "500", // Reward points or amount
-      pointsUsed: "200", // Points used
-      lastPaymentDate: "2025-01-01", // Added Last Payment Date
-      expiryDate: "2026-01-01", // Added Expiry Date
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "john@email.com",
-      retailer: 3,
-      sales: "500",
-      status: "Inactive",
-      phone: "+9876543210",
-      location: "California",
-      businessName: "John's Shop",
-      subscription: "Basic", // Subscription Type
-      tier: "Silver",
-      date: "2025-05-10", // Date
-      reward: "400", // Reward points or amount
-      pointsUsed: "100", // Points used
-      lastPaymentDate: "2025-05-01", // Added Last Payment Date
-      expiryDate: "2026-05-01", // Added Expiry Date
-    },
-    {
-      id: 3,
-      name: "John",
-      image: "https://i.ibb.co/8gh3mqPR/Ellipse-48-1.jpg",
-      email: "john@email.com",
-      retailer: 3,
-      sales: "500",
-      status: "Active",
-      phone: "+9876543210",
-      location: "California",
-      businessName: "John's Shop",
-      subscription: "Premium", // Subscription Type
-      tier: "Platinum",
-      date: "2025-03-20", // Date
-      reward: "600", // Reward points or amount
-      pointsUsed: "250", // Points used
-      lastPaymentDate: "2025-03-15", // Added Last Payment Date
-      expiryDate: "2026-03-15", // Added Expiry Date
-    },
-  ]);
-
-  const columns2 = [
-    {
-      title: "SL", // Serial number
-      dataIndex: "id", // Assuming the ID is used as the serial number
-      key: "id",
-      align: "center",
-    },
-    {
-      title: "Subscription Type", // Subscription Type
-      dataIndex: "subscription", // Assuming each record has a 'subscription' field
-      key: "subscription",
-      align: "center",
-    },
-    {
-      title: "Date", // Date
-      dataIndex: "date", // Assuming a 'date' field exists in your data
-      key: "date",
-      align: "center",
-    },
-    {
-      title: "Reward", // Reward (Could be points, discounts, etc.)
-      dataIndex: "reward", // Assuming a 'reward' field exists
-      key: "reward",
-      align: "center",
-    },
-    {
-      title: "Points Used", // Points Used
-      dataIndex: "pointsUsed", // Assuming a 'pointsUsed' field exists
-      key: "pointsUsed",
-      align: "center",
-    },
-  ];
-
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [searchText, setSearchText] = useState("");
-
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [form] = Form.useForm();
-  const navigate = useNavigate();
+
+  const queryParams = [
+    { name: "page", value: page },
+    { name: "limit", value: limit },
+  ];
+  if (searchText.trim()) {
+    queryParams.push({ name: "searchTerm", value: searchText.trim() });
+  }
+
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetCustomerProfileQuery(queryParams);
+
+  console.log(response);
+
+  const tableData = useMemo(() => {
+    const items = response?.data || [];
+    return items.map((item, index) => ({
+      key: item._id,
+      id: index + 1 + (page - 1) * limit,
+      customerId: item.customerId || "-",
+      customerName: item.firstName || "-",
+      subscription: item.subscription || "-",
+      tier: item.tier || "-",
+      phone: item.phone || "-",
+      email: item.email || "-",
+      location: item.location || "-",
+      refdRep: item.refdRep || "-",
+      totalSales: item.totalSales || 0,
+      status: item.status === "active" ? "Active" : "Inactive",
+      raw: item,
+    }));
+  }, [response, page, limit]);
+
+  const paginationData = {
+    pageSize: limit,
+    total: response?.pagination?.total || 0,
+    current: page,
+  };
+
+  const handlePaginationChange = (newPage, newPageSize) => {
+    setPage(newPage);
+    if (newPageSize !== limit) {
+      setLimit(newPageSize);
+    }
+  };
 
   const editFields = [
-    { name: "name", label: "Customer Name", rules: [{ required: true }] },
+    {
+      name: "customerName",
+      label: "Customer Name",
+      rules: [{ required: true }],
+    },
     { name: "email", label: "Email Address", rules: [{ required: true }] },
     {
       name: "subscription",
@@ -167,7 +96,7 @@ const CustomerManagement = () => {
   const showEditModal = (record) => {
     setSelectedRecord(record);
     form.setFieldsValue({
-      name: record.name,
+      customerName: record.customerName,
       email: record.email,
       subscription: record.subscription,
       tier: record.tier,
@@ -186,7 +115,7 @@ const CustomerManagement = () => {
 
   const handleEditSubmit = (values) => {
     const updatedRecord = { ...selectedRecord, ...values };
-    setData((prev) =>
+    setTableData((prev) =>
       prev.map((item) => (item.id === selectedRecord.id ? updatedRecord : item))
     );
     setIsEditModalVisible(false);
@@ -194,149 +123,48 @@ const CustomerManagement = () => {
     Swal.fire("Updated!", "The customer details were updated.", "success");
   };
 
-  const filteredData = data.filter(
-    (item) =>
-      item.id.toString().includes(searchText) ||
-      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.phone.includes(searchText) ||
-      item.email.toLowerCase().includes(searchText.toLowerCase()) ||
-      (item.location || "").toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleDelete = (recordId) => {
+    setTableData((prev) => prev.filter((item) => item.id !== recordId));
+  };
 
-  const columns = [
-    { title: "SL", dataIndex: "id", key: "id", align: "center" },
-    { title: "Customer ID", dataIndex: "id", key: "id", align: "center" },
+  const handleStatusChange = (recordId, newStatus) => {
+    setTableData((prev) =>
+      prev.map((item) =>
+        item.id === recordId ? { ...item, status: newStatus } : item
+      )
+    );
+  };
+
+  const datailsColumns = [
     {
-      title: "Customer Name",
-      dataIndex: "businessName",
-      key: "businessName",
+      title: "SL",
+      dataIndex: "id",
+      key: "id",
       align: "center",
     },
     {
-      title: "Subscription",
+      title: "Subscription Type",
       dataIndex: "subscription",
       key: "subscription",
       align: "center",
     },
     {
-      title: "Tier",
-      dataIndex: "tier",
-      key: "tier",
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
       align: "center",
     },
     {
-      title: "Phone Number",
-      dataIndex: "phone",
-      key: "phone",
+      title: "Reward",
+      dataIndex: "reward",
+      key: "reward",
       align: "center",
     },
-    { title: "Email", dataIndex: "email", key: "email", align: "center" },
     {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
+      title: "Points Used",
+      dataIndex: "pointsUsed",
+      key: "pointsUsed",
       align: "center",
-    },
-    { title: "Refer Rep", dataIndex: "name", key: "salesRep", align: "center" },
-    { title: "Total Sales", dataIndex: "sales", key: "sales", align: "center" },
-    { title: "Status", dataIndex: "status", key: "status", align: "center" },
-    {
-      title: "Action",
-      key: "action",
-      align: "center",
-      width: 170,
-      render: (_, record) => (
-        <div
-          className="flex gap-2 justify-between align-middle py-[7px] px-[15px] border border-primary rounded-md"
-          style={{ alignItems: "center" }}
-        >
-          <Tooltip title="View Details">
-            <button
-              onClick={() => showViewModal(record)}
-              className="text-primary hover:text-green-700 text-xl"
-            >
-              <IoEyeSharp />
-            </button>
-          </Tooltip>
-
-          <Tooltip title="Edit">
-            <button
-              onClick={() => showEditModal(record)}
-              className="text-primary hover:text-green-700 text-xl"
-            >
-              <FaEdit />
-            </button>
-          </Tooltip>
-
-          <Tooltip title="Delete">
-            <button
-              onClick={() => {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    setData(data.filter((item) => item.id !== record.id));
-                    Swal.fire({
-                      title: "Deleted!",
-                      text: "Your record has been deleted.",
-                      icon: "success",
-                    });
-                  }
-                });
-              }}
-              className="text-red-500 hover:text-red-700 text-md"
-            >
-              <FaTrash />
-            </button>
-          </Tooltip>
-
-          <Switch
-            size="small"
-            checked={record.status === "Active"}
-            style={{
-              backgroundColor: record.status === "Active" ? "#3fae6a" : "gray",
-            }}
-            onChange={(checked) => {
-              Swal.fire({
-                title: "Are you sure?",
-                text: `You are about to change status to ${
-                  checked ? "Active" : "Inactive"
-                }.`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, change it!",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  setData((prev) =>
-                    prev.map((item) =>
-                      item.id === record.id
-                        ? { ...item, status: checked ? "Active" : "Inactive" }
-                        : item
-                    )
-                  );
-                  Swal.fire({
-                    title: "Updated!",
-                    text: `Status has been changed to ${
-                      checked ? "Active" : "Inactive"
-                    }.`,
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false,
-                  });
-                }
-              });
-            }}
-          />
-        </div>
-      ),
     },
   ];
 
@@ -370,27 +198,25 @@ const CustomerManagement = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table
-          dataSource={filteredData}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-          bordered={false}
-          size="small"
-          rowClassName="custom-row"
-          components={components}
-          className="custom-table"
-          scroll={{ x: "max-content" }}
-        />
-      </div>
+      <CustomerTable
+        data={tableData}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        onView={showViewModal}
+        onEdit={showEditModal}
+        onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
+        pagination={paginationData}
+        onPaginationChange={handlePaginationChange}
+      />
 
       {/* View Details Modal */}
       <ViewModal
         visible={isViewModalVisible}
         onCancel={handleCloseViewModal}
         selectedRecord={selectedRecord}
-        columns2={columns2}
-        data={data}
+        columns2={datailsColumns}
+        data={tableData}
       />
 
       {/* Edit Customer Modal */}
