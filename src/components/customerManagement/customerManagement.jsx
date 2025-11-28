@@ -1,21 +1,13 @@
 "use client";
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Switch,
-  Table,
-  Tooltip,
-} from "antd";
-import dayjs from "dayjs"; // ✅ AntD v5 uses Dayjs
+import { Button, Form, Input, Modal, Switch, Table, Tooltip } from "antd";
+import dayjs from "dayjs";
 import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import MarchantIcon from "../../assets/marchant.png";
+import EditModal from "./components/EditModal";
+import ViewModal from "./components/ViewModal";
 
 const components = {
   header: {
@@ -142,13 +134,25 @@ const CustomerManagement = () => {
   ];
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // Add Edit Modal state
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [searchText, setSearchText] = useState(""); // Search text state
+  const [searchText, setSearchText] = useState("");
 
-  const [form] = Form.useForm(); // Declare the form here to use Ant Design's form functionality
-
+  const [form] = Form.useForm();
   const navigate = useNavigate();
+
+  const editFields = [
+    { name: "name", label: "Customer Name", rules: [{ required: true }] },
+    { name: "email", label: "Email Address", rules: [{ required: true }] },
+    {
+      name: "subscription",
+      label: "Subscription Type",
+      rules: [{ required: true }],
+    },
+    { name: "tier", label: "Tier", rules: [{ required: true }] },
+    { name: "lastPaymentDate", label: "Last Payment Date", type: "date" },
+    { name: "expiryDate", label: "Expiry Date", type: "date" },
+  ];
 
   const showViewModal = (record) => {
     setSelectedRecord(record);
@@ -168,7 +172,7 @@ const CustomerManagement = () => {
       subscription: record.subscription,
       tier: record.tier,
       lastPaymentDate: record.lastPaymentDate
-        ? dayjs(record.lastPaymentDate) // Use Dayjs for DatePicker value
+        ? dayjs(record.lastPaymentDate)
         : null,
       expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null,
     });
@@ -180,23 +184,14 @@ const CustomerManagement = () => {
     setSelectedRecord(null);
   };
 
-  const handleEditSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const updatedRecord = { ...selectedRecord, ...values };
-        setData((prev) =>
-          prev.map((item) =>
-            item.id === selectedRecord.id ? updatedRecord : item
-          )
-        );
-        setIsEditModalVisible(false);
-        form.resetFields();
-        Swal.fire("Updated!", "The customer details were updated.", "success");
-      })
-      .catch((error) => {
-        console.error("Validation failed:", error);
-      });
+  const handleEditSubmit = (values) => {
+    const updatedRecord = { ...selectedRecord, ...values };
+    setData((prev) =>
+      prev.map((item) => (item.id === selectedRecord.id ? updatedRecord : item))
+    );
+    setIsEditModalVisible(false);
+    form.resetFields();
+    Swal.fire("Updated!", "The customer details were updated.", "success");
   };
 
   const filteredData = data.filter(
@@ -266,7 +261,7 @@ const CustomerManagement = () => {
 
           <Tooltip title="Edit">
             <button
-              onClick={() => showEditModal(record)} // Edit modal
+              onClick={() => showEditModal(record)}
               className="text-primary hover:text-green-700 text-xl"
             >
               <FaEdit />
@@ -390,135 +385,24 @@ const CustomerManagement = () => {
       </div>
 
       {/* View Details Modal */}
-      <Modal
+      <ViewModal
         visible={isViewModalVisible}
         onCancel={handleCloseViewModal}
-        width={700}
-        footer={false}
-      >
-        {selectedRecord && (
-          <div>
-            <div className="flex flex-row justify-between items-start gap-3 mt-8">
-              <img
-                src={MarchantIcon}
-                alt={selectedRecord.name}
-                className="w-214 h-214 rounded-full"
-              />
-              <div className="flex flex-col gap-2 border border-primary rounded-md p-4 w-full">
-                <p className="text-[22px] font-bold text-primary">
-                  Customer Profile
-                </p>
-
-                {/* Displaying the customer details */}
-                <p>
-                  <strong>Customer Name:</strong> {selectedRecord.name}
-                </p>
-                <p>
-                  <strong>Phone Number:</strong> {selectedRecord.phone}
-                </p>
-                <p>
-                  <strong>Email Address:</strong> {selectedRecord.email}
-                </p>
-                <p>
-                  <strong>Address:</strong> {selectedRecord.location}
-                </p>
-
-                {/* Adding the new fields */}
-                <p className="text-[22px] font-bold text-primary mt-4">
-                  Loyalty Points
-                </p>
-                <p>
-                  <strong>Points Balance:</strong> {selectedRecord.sales}{" "}
-                  {/* Points Balance */}
-                </p>
-                <p>
-                  <strong>Tier:</strong> {selectedRecord.tier} {/* Tier */}
-                </p>
-                <p>
-                  <strong>Subscription Type:</strong>{" "}
-                  {selectedRecord.subscription} {/* Subscription Type */}
-                </p>
-                <p>
-                  <strong>Last Payment Date:</strong>{" "}
-                  {selectedRecord.lastPaymentDate} {/* Last Payment Date */}
-                </p>
-                <p>
-                  <strong>Expiry Date:</strong> {selectedRecord.expiryDate}{" "}
-                  {/* Expiry Date */}
-                </p>
-              </div>
-            </div>
-
-            {/* Table (assuming this shows the customer's order history or other details) */}
-            <Table
-              columns={columns2}
-              dataSource={data}
-              rowKey="orderId"
-              pagination={{ pageSize: 5 }}
-              className="mt-6"
-            />
-          </div>
-        )}
-      </Modal>
+        selectedRecord={selectedRecord}
+        columns2={columns2}
+        data={data}
+      />
 
       {/* Edit Customer Modal */}
-      <Modal
-        title="Edit Customer"
+      <EditModal
         visible={isEditModalVisible}
+        title="Edit Customer"
         onCancel={handleCloseEditModal}
-        onOk={handleEditSubmit}
-        width={600}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          className="flex flex-col gap-4 mb-6"
-        >
-          <Form.Item
-            label="Customer Name"
-            name="name"
-            rules={[{ required: true }]}
-          >
-            <Input className="mli-tall-input" />
-          </Form.Item>
-
-          <Form.Item
-            label="Email Address"
-            name="email"
-            rules={[{ required: true }]}
-          >
-            <Input className="mli-tall-input" />
-          </Form.Item>
-
-          <Form.Item
-            label="Subscription Type"
-            name="subscription"
-            rules={[{ required: true }]}
-          >
-            <Input className="mli-tall-input" />
-          </Form.Item>
-
-          <Form.Item label="Tier" name="tier" rules={[{ required: true }]}>
-            <Input className="mli-tall-input" />
-          </Form.Item>
-
-          <Form.Item label="Last Payment Date" name="lastPaymentDate">
-            <DatePicker
-              style={{ width: "100%" }}
-              format="YYYY-MM-DD"
-              className="mli-tall-picker"
-            />
-          </Form.Item>
-
-          <Form.Item label="Expiry Date" name="expiryDate">
-            <DatePicker
-              style={{ width: "100%" }}
-              format="YYYY-MM-DD"
-              className="mli-tall-picker"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
+        onSubmit={handleEditSubmit}
+        form={form}
+        selectedRecord={selectedRecord}
+        fields={editFields}
+      />
     </div>
   );
 };

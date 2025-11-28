@@ -46,7 +46,7 @@ const Login = () => {
         layout="vertical"
         className="flex flex-col gap-4"
       >
-        <FormItem name={"email"} label={"Email"} />
+        <FormItem name={"email"} label={"Phone/Email"} />
 
         <Form.Item
           name="password"

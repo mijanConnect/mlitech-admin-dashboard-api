@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import Auth from "../Layout/Auth/Auth";
 import Main from "../Layout/Main/Main";
 import Home from "../Pages/Dashboard/Home";
-import AboutUs from "../Pages/Dashboard/AboutUs";
 import PrivacyPolicy from "../Pages/Dashboard/PrivacyPolicy";
 import TermsAndConditions from "../Pages/Dashboard/TermsAndCondition";
 import ChangePassword from "../Pages/Auth/ChangePassword";
@@ -15,7 +14,6 @@ import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 import SaleRepsManagement from "../Pages/Dashboard/SaleRepsManagement";
 import LoyaltyProgram from "../Pages/Dashboard/LoyaltyProgram";
 import SubscriptionTable from "../components/subscriber/SubscriberTable";
-import UserManagement from "../components/userMangement/UserManagement";
 import PackagesPlans from "../Pages/Dashboard/Subscription";
 import Contact from "../Pages/Dashboard/Contact";
 import ResetSuccess from "../Pages/Auth/ResetSuccess";
@@ -88,17 +86,10 @@ const router = createBrowserRouter([
         path: "/loyaltyProgram",
         element: <LoyaltyProgram />,
       },
-      {
-        path: "/user",
-        element: <UserManagement />,
-      },
+
       {
         path: "/subscription",
         element: <PackagesPlans />,
-      },
-      {
-        path: "/about-us",
-        element: <AboutUs />,
       },
       {
         path: "/contact",
