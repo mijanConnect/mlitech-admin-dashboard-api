@@ -1,11 +1,11 @@
 "use client";
 import { Button, Form, Input } from "antd";
 import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import EditModal from "./components/EditModal";
 import ViewModal from "./components/ViewModal";
-import CustomerTable from "./components/CustomerTableColumn";
+import { useSearchParams } from "react-router-dom";
 import { useGetCustomerProfileQuery } from "../../redux/apiSlices/customerSlice";
 import CustomerTableColumn from "./components/CustomerTableColumn";
 
@@ -13,6 +13,7 @@ const CustomerManagement = () => {
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -135,6 +136,28 @@ const CustomerManagement = () => {
       )
     );
   };
+
+  // Sync URL params with state
+  useEffect(() => {
+    const params = {};
+
+    params.page = page;
+    params.limit = limit;
+
+    if (searchText.trim()) {
+      params.searchTerm = searchText.trim();
+    }
+
+    setSearchParams(params);
+  }, [page, limit, searchText]);
+
+  useEffect(() => {
+    const urlPage = searchParams.get("page");
+    const urlSearch = searchParams.get("searchTerm");
+
+    if (urlPage) setPage(Number(urlPage));
+    if (urlSearch) setSearchText(urlSearch);
+  }, []);
 
   const datailsColumns = [
     {
