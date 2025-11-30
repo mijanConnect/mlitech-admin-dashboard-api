@@ -43,4 +43,4 @@ export const homeApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetStatisticsDataQuery } = homeApi;
+export const { useGetStatisticsDataQuery, useGetLineChartDataQuery } = homeApi;
