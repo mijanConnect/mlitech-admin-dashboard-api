@@ -5,9 +5,35 @@ export const UserContext = React.createContext(null);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("token") : null
+  );
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // Listen for token changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "token") {
+        setToken(e.newValue);
+      }
+    };
+
+    // Also check for token changes periodically
+    const checkToken = () => {
+      const currentToken = localStorage.getItem("token");
+      if (currentToken !== token) {
+        setToken(currentToken);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    const interval = setInterval(checkToken, 500); // Check every 500ms
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [token]);
+
   const {
     data: profile,
     isLoading,

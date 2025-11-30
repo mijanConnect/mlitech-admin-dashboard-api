@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import FormItem from "../../components/common/FormItem";
 import image4 from "../../assets/image4.png";
 import { useLoginMutation } from "../../redux/apiSlices/authSlice";
+import { useUser } from "../../provider/User";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { refetch } = useUser();
   const [login, { isLoading }] = useLoginMutation();
 
   const onFinish = async (values) => {
@@ -25,6 +27,14 @@ const Login = () => {
 
       message.success("Login successful!");
 
+      // Refetch profile after login
+      try {
+        await refetch();
+      } catch (error) {
+        console.warn("Profile fetch delayed:", error);
+      }
+
+      // Navigate to dashboard
       navigate("/", { replace: true });
     } catch (err) {
       message.error(err?.data?.message || "Login failed!");

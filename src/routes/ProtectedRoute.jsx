@@ -33,7 +33,7 @@ const PrivateRoute = ({ children }) => {
   const tokenPayload = parseJwt();
   const tokenRole = tokenPayload?.role;
 
-  // If token already has valid role, allow fast
+  // If token already has valid role, allow fast path
   if (tokenRole && allowedRoles.includes(tokenRole)) {
     return children;
   }
@@ -47,14 +47,25 @@ const PrivateRoute = ({ children }) => {
     skip: !localStorage.getItem("token"), // don't fetch if no token
   });
 
-  console.log(profile)
+  console.log("Profile data:", profile);
+  console.log("Is loading:", isLoading);
+  console.log("Is error:", isError);
 
+  // While loading, show loading screen
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3FAE6A] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   // If API failed → user not logged in
   if (isError) {
+    console.log("Profile query error, redirecting to login");
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
@@ -64,6 +75,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   // Otherwise unauthorized
+  console.log("User role not authorized:", profile?.role);
   return <Navigate to="/auth/login" state={{ from: location }} replace />;
 };
 

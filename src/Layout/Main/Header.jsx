@@ -16,17 +16,17 @@ const Header = ({ toggleSidebar, isMobile }) => {
     : getImageUrl(user?.image);
 
   const showLogoutConfirm = () => {
-    setIsLogoutModalOpen(true); // Show the confirmation modal
+    setIsLogoutModalOpen(true);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsLogoutModalOpen(false); // Close the modal
+    setIsLogoutModalOpen(false);
     navigate("/auth/login");
   };
 
   const handleCancelLogout = () => {
-    setIsLogoutModalOpen(false); // Close the confirmation modal
+    setIsLogoutModalOpen(false);
   };
 
   const menu = (

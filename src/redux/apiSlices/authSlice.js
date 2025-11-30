@@ -69,7 +69,7 @@ export const authApi = api.injectEndpoints({
       query: (data) => {
         const { headers, ...body } = data;
         const finalHeaders = headers || {};
-        
+
         return {
           url: "/auth/reset-password",
           method: "POST",
