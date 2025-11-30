@@ -40,7 +40,26 @@ export const homeApi = api.injectEndpoints({
       transformResponse: (response) => response,
       providesTags: ["Statistics"],
     }),
+    // ---------------------------------------
+    // GET Yearly Revenue Data
+    // ---------------------------------------
+    getYearlyRevenueData: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((arg) => {
+            params.append(arg.name, arg.value);
+          });
+        }
+        return {
+          url: `/overview/yearly-revenue?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      transformResponse: (response) => response,
+      providesTags: ["Statistics"],
+    }),
   }),
 });
 
-export const { useGetStatisticsDataQuery, useGetLineChartDataQuery } = homeApi;
+export const { useGetStatisticsDataQuery, useGetLineChartDataQuery, useGetYearlyRevenueDataQuery } = homeApi;

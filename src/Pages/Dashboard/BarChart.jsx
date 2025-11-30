@@ -7,8 +7,10 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bar } from "react-chartjs-2";
+import dayjs from "dayjs";
+import { useGetYearlyRevenueDataQuery } from "../../redux/apiSlices/homeSlice";
 
 // Register Chart.js components
 ChartJS.register(
@@ -21,10 +23,8 @@ ChartJS.register(
 );
 
 const BarChart = () => {
-  const [chartHeight, setChartHeight] = useState("200px");
-  // responsive bar thickness so bars don't touch on small screens
+  const [chartHeight, setChartHeight] = useState("250px");
   const [barThickness, setBarThickness] = useState(() => {
-    // Start at 90 on very large screens and step down as viewport shrinks
     const w = typeof window !== "undefined" ? window.innerWidth : 1024;
     if (w < 480) return 14;
     if (w < 768) return 20;
@@ -36,13 +36,30 @@ const BarChart = () => {
     return 90;
   });
 
+  const [rangeOpen, setRangeOpen] = useState(false);
+  const [start, setStart] = useState(
+    dayjs().subtract(3, "years").startOf("year").format("YYYY-MM-DD")
+  );
+  const [end, setEnd] = useState(dayjs().endOf("year").format("YYYY-MM-DD"));
+
+  // Fetch data from API
+  const queryParams = [
+    { name: "start", value: start },
+    { name: "end", value: end },
+  ];
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useGetYearlyRevenueDataQuery(queryParams);
+
   // Effect to update chart height based on screen size
   useEffect(() => {
     const updateChartHeight = () => {
       if (window.innerWidth < 768) setChartHeight("150px");
       else if (window.innerWidth < 1024) setChartHeight("200px");
       else setChartHeight("250px");
-      // update bar thickness responsively
       const w = window.innerWidth;
       if (w < 480) setBarThickness(14);
       else if (w < 768) setBarThickness(20);
@@ -59,61 +76,9 @@ const BarChart = () => {
     return () => window.removeEventListener("resize", updateChartHeight);
   }, []);
 
-  // Sample monthly data for each year (replace with real data as needed)
-  const monthlyDataByYear = {
-    [new Date().getFullYear()]: [
-      100, 90, 120, 110, 95, 105, 130, 125, 115, 140, 135, 145,
-    ],
-    [new Date().getFullYear() - 1]: [
-      90, 80, 110, 100, 85, 95, 120, 115, 105, 130, 125, 135,
-    ],
-    [new Date().getFullYear() - 2]: [
-      95, 85, 115, 105, 90, 100, 125, 120, 110, 135, 130, 140,
-    ],
-  };
-
-  // Compute annual totals from monthly data
-  const annualTotals = Object.keys(monthlyDataByYear).reduce((acc, y) => {
-    const year = Number(y);
-    const total = (monthlyDataByYear[year] || []).reduce(
-      (s, v) => s + (Number(v) || 0),
-      0
-    );
-    acc[year] = total;
-    return acc;
-  }, {});
-
-  // Available years from the sample data (sorted ascending)
-  const availableYears = Object.keys(annualTotals)
-    .map(Number)
-    .sort((a, b) => a - b);
-
-  // Default start/end years (earliest -> latest available)
-  const defaultStartYear = availableYears[0] ?? new Date().getFullYear();
-  const defaultEndYear =
-    availableYears[availableYears.length - 1] ?? new Date().getFullYear();
-
-  // Start/End year state
-  const [startYear, setStartYear] = useState(defaultStartYear);
-  const [endYear, setEndYear] = useState(defaultEndYear);
-
-  // Date range picker state (string format YYYY-MM-DD)
-  const [rangeOpen, setRangeOpen] = useState(false);
-  const [start, setStart] = useState(`${defaultStartYear}-01-01`);
-  const [end, setEnd] = useState(`${defaultEndYear}-12-31`);
-
-  // Sync date inputs to year values
-  useEffect(() => {
-    try {
-      const sYear = start ? new Date(start).getFullYear() : defaultStartYear;
-      const eYear = end ? new Date(end).getFullYear() : defaultEndYear;
-      if (!Number.isNaN(sYear)) setStartYear(sYear);
-      if (!Number.isNaN(eYear)) setEndYear(eYear);
-    } catch (err) {
-      // ignore invalid dates
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [start, end]);
+  // Extract years from date range
+  const startYear = new Date(start).getFullYear();
+  const endYear = new Date(end).getFullYear();
 
   // Helper: inclusive year range array
   const makeYearRange = (s, e) => {
@@ -122,30 +87,64 @@ const BarChart = () => {
     return out;
   };
 
-  // Ensure startYear <= endYear logically (if not, adjust)
-  useEffect(() => {
-    if (startYear > endYear) setEndYear(startYear);
-    if (endYear < startYear) setStartYear(endYear);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startYear, endYear]);
-
-  // Build chart data for the selected year range (one bar per year)
+  // Build chart data from API response
   const yearsInRange = makeYearRange(startYear, endYear);
-  const chartData = {
-    labels: yearsInRange.map(String),
-    datasets: [
-      {
-        label: `Revenue (${startYear} - ${endYear})`,
-        data: yearsInRange.map((y) => annualTotals[y] || 0),
-        backgroundColor: "#3fae6a",
-        borderRadius: 0,
-        // increase computed thickness to make bars wider, but cap it
-        // use a larger multiplier and higher cap for visibly wider bars
-        barThickness: Math.min(barThickness * 4, 450),
-        maxBarThickness: 450,
-      },
-    ],
-  };
+  const chartData = useMemo(() => {
+    if (!response?.data || isLoading) {
+      return {
+        labels: yearsInRange.map(String),
+        datasets: [
+          {
+            label: `Revenue (${startYear} - ${endYear})`,
+            data: [],
+            backgroundColor: "#3fae6a",
+            borderRadius: 0,
+            barThickness: Math.min(barThickness * 4, 450),
+            maxBarThickness: 450,
+          },
+        ],
+      };
+    }
+
+    // Map API response to chart data
+    const yearToRevenue = {};
+    response.data.forEach((item) => {
+      yearToRevenue[item.year] = item.totalRevenue;
+    });
+
+    return {
+      labels: yearsInRange.map(String),
+      datasets: [
+        {
+          label: `Revenue (${startYear} - ${endYear})`,
+          data: yearsInRange.map((y) => yearToRevenue[y] || 0),
+          backgroundColor: "#3fae6a",
+          borderRadius: 0,
+          barThickness: Math.min(barThickness * 4, 450),
+          maxBarThickness: 450,
+        },
+      ],
+    };
+  }, [
+    response?.data,
+    isLoading,
+    startYear,
+    endYear,
+    yearsInRange,
+    barThickness,
+  ]);
+
+  // Show loading state
+  if (isLoading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <div className="text-center py-4 text-red-500">Error loading data.</div>
+    );
+  }
 
   const options = {
     responsive: true,

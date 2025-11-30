@@ -192,7 +192,7 @@ const LineChart = () => {
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-4 gap-2 sm:gap-0">
         <h2 className="text-lg sm:text-xl font-bold text-secondary">
-          Total Revenue
+          Monthly Revenue
         </h2>
 
         {/* Range picker (native) */}
