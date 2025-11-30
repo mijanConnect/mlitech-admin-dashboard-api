@@ -1,11 +1,12 @@
 import { Badge, Button, Dropdown, Menu, Modal } from "antd";
 import { useState } from "react";
 import { FaRegBell } from "react-icons/fa6";
+import { Menu as MenuIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../components/common/imageUrl";
 import { useUser } from "../../provider/User";
 
-const Header = ({ toggleSidebar, toggleDrawer }) => {
+const Header = ({ toggleSidebar, isMobile }) => {
   const { user } = useUser();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -46,11 +47,17 @@ const Header = ({ toggleSidebar, toggleDrawer }) => {
 
   return (
     <div className="flex items-center justify-between gap-5 w-full px-6 rounded-md shadow-sm py-2 bg-white border-b border-gray-200">
-      <div className="py-2">
+      <div className="py-2 flex items-center gap-4">
+        {isMobile && (
+          <button
+            onClick={toggleSidebar}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Toggle Sidebar"
+          >
+            <MenuIcon size={24} color="#3FAE6A" />
+          </button>
+        )}
         <h2 className="font-bold text-xl text-secondary">Admin Dashboard</h2>
-        {/* <p className="text-[12px] font-normal text-secondary mt-1">
-          36 East 8th Street, New York, NY 10003, United States.
-        </p> */}
       </div>
       <div className="flex items-center gap-3">
         {/* Profile Icon with Dropdown Menu */}
