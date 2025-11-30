@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import { FaCalendarDay, FaDollarSign } from "react-icons/fa";
-import { HiMiniUsers } from "react-icons/hi2";
-import { MdArrowUpward, MdOutlineHome } from "react-icons/md";
-import { PiHouseLine } from "react-icons/pi";
-import { Bar } from "react-chartjs-2";
+import { useState } from "react";
 import LineChart from "./LineChart";
 import {
   Chart as ChartJS,
@@ -14,14 +9,13 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import OrderTable from "../../components/home/OrderTable";
-import SalesLeaderBoard from "../../components/home/SalesLeaderBoard";
-import HomeCard from "../../components/home/HomeCard";
 import { Marchant } from "../../components/common/Svg";
 import { People } from "../../components/common/Svg";
 import { Pending } from "../../components/common/Svg";
 import { SubscriptionManagement } from "../../components/common/Svg";
 import BarChart from "./BarChart";
+import { useSearchParams } from "react-router-dom";
+import { useGetStatisticsDataQuery } from "../../redux/apiSlices/homeSlice";
 
 ChartJS.register(
   CategoryScale,
@@ -34,81 +28,38 @@ ChartJS.register(
 
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState("Last 7 Days");
+  const [selected, setSelected] = useState("7d");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const options2 = ["Today", "Last 7 Days", "Last 30 Days", "This Month"];
-  const data = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        label: "Subscriptions",
-        data: [64, 27, 83, 90, 87, 85, 70, 40, 32, 74, 65, 70],
-        backgroundColor: "#3FC7EE",
-        borderColor: "#A1A1A1",
-        borderWidth: 1,
-        barThickness: 24,
-        maxBarThickness: 24,
-      },
-    ],
+  // Map display text to API values
+  const optionsMap = {
+    "1d": "Today",
+    "7d": "Last 7 Days",
+    "30d": "Last 30 Days",
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-          color: "#A1A1A1",
-        },
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 20,
-          suggestedMin: 0,
-          suggestedMax: 100,
-        },
-        grid: {
-          display: true,
-          lineWidth: 2,
-        },
-      },
-    },
-  };
+  const queryParams = [{ name: "range", value: selected }];
+
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useGetStatisticsDataQuery(queryParams);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading data.</div>;
+  }
+
+  console.log(response);
+
+  const options2 = ["1d", "7d", "30d"];
 
   return (
     <div className="space-y-6">
-      {/* Home Card */}
-      {/* <div>
-        <HomeCard />
-      </div> */}
-
-      {/* Line Chart Section */}
-      {/* <div className="w-full">
-        <div className="w-full bg-primary p-3 md:p-4 lg:p-6 rounded-lg">
-          <LineChart />
-        </div>
-      </div> */}
-
       <div className="flex flex-col xl:flex-row gap-7 rounded-lg">
         {/* Line Chart Section */}
         <div className="w-full xl:flex-1 border border-primary bg-[#D7F4DE] rounded-lg p-6">
@@ -127,7 +78,7 @@ const Home = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full font-medium text-[14px] py-[8px] px-[16px] border border-primary text-secondary rounded-lg text-left flex justify-between items-center"
               >
-                {selected}
+                {optionsMap[selected]}
                 <span className="ml-2">▼</span>
               </button>
 
@@ -143,7 +94,7 @@ const Home = () => {
                       }}
                       className="cursor-pointer px-4 py-2 text-black hover:bg-primary/10"
                     >
-                      {option}
+                      {optionsMap[option]}
                     </li>
                   ))}
                 </ul>
@@ -159,7 +110,7 @@ const Home = () => {
                 </h2>
                 <h3 className="text-secondary text-[24px] font-semibold flex items-center gap-3">
                   <Marchant className="w-[20px] h-[20px] text-secondary" />
-                  23
+                  {response?.data?.providers || 0}
                 </h3>
               </div>
             </div>
@@ -171,7 +122,7 @@ const Home = () => {
                 </h2>
                 <h3 className="text-secondary text-[24px] font-semibold flex items-center gap-3">
                   <People className="w-[20px] h-[20px] text-secondary" />
-                  500
+                  {response?.data?.customers || 0}
                 </h3>
               </div>
             </div>
@@ -182,7 +133,8 @@ const Home = () => {
                   Pending Approvals
                 </h2>
                 <h3 className="text-secondary text-[24px] font-semibold flex items-center gap-3">
-                  <Pending className="w-[20px] h-[20px] text-secondary" />3
+                  <Pending className="w-[20px] h-[20px] text-secondary" />
+                  {response?.data?.pendingApprovals || 0}
                 </h3>
               </div>
             </div>
@@ -194,7 +146,7 @@ const Home = () => {
                 </h2>
                 <h3 className="text-secondary text-[24px] font-semibold flex items-center gap-3">
                   <SubscriptionManagement className="w-[20px] h-[20px] text-secondary" />
-                  $4000
+                  ${response?.data?.subscriptionRevenue || 0}
                 </h3>
               </div>
             </div>

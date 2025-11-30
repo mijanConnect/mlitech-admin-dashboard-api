@@ -21,8 +21,6 @@ export const authApi = api.injectEndpoints({
 
     // ---------------------------------------
     // RESEND OTP
-    // Endpoint: POST /auth/phone-otp
-    // Body: { phone }
     // ---------------------------------------
     resendOtp: builder.mutation({
       query: (data) => ({
