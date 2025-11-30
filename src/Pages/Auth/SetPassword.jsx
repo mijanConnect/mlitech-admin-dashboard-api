@@ -1,27 +1,77 @@
 import { Button, ConfigProvider, Form, Input } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import keyIcon from "../../assets/key.png"
+import keyIcon from "../../assets/key.png";
 import { ArrowLeft } from "lucide-react";
+import { useResetPasswordMutation } from "../../redux/apiSlices/authSlice";
+import Swal from "sweetalert2";
 
 const SetPassword = () => {
-
-  const email = new URLSearchParams(location.search).get("email")
+  const phone = new URLSearchParams(location.search).get("phone");
   const navigate = useNavigate();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-  const onFinish = async(values) => {
-        navigate(`/auth/login`);
+  const onFinish = async (values) => {
+    try {
+      const resetToken = localStorage.getItem("resetToken");
+
+      if (!resetToken) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Reset token not found. Please try again.",
+        });
+        navigate("/auth/forgot-password");
+        return;
+      }
+
+      // Send reset password request with resetToken in headers
+      const response = await resetPassword({
+        newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword,
+        headers: {
+          Authorization: resetToken,
+        },
+      }).unwrap();
+
+      Swal.fire({
+        icon: "success",
+        title: "Password Reset",
+        text: "Your password has been reset successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // Clear tokens
+      localStorage.removeItem("resetToken");
+      localStorage.removeItem("token");
+
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 1500);
+    } catch (error) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.data?.errorMessages?.[0]?.message ||
+        error?.message ||
+        "Failed to reset password";
+      Swal.fire({
+        icon: "error",
+        title: "Password Reset Failed",
+        text: errorMessage,
+      });
+    }
   };
 
   return (
     <div>
-      <img src={keyIcon} alt="KeyIcon" className="mb-[24px] mx-auto"/>
-        <div className="text-center mb-8">
-          <h1 className="text-[25px] font-semibold mb-6">Set new password</h1>
-          <p className="w-[90%] mx-auto text-base">
-            Your new password must be different to previously used passwords.
-          </p>
-        </div>
+      <img src={keyIcon} alt="KeyIcon" className="mb-[24px] mx-auto" />
+      <div className="text-center mb-8">
+        <h1 className="text-[25px] font-semibold mb-6">Set new password</h1>
+        <p className="w-[90%] mx-auto text-base">
+          Your new password must be different to previously used passwords.
+        </p>
+      </div>
 
       <Form layout="vertical" onFinish={onFinish}>
         <Form.Item
@@ -112,6 +162,7 @@ const SetPassword = () => {
           <button
             htmlType="submit"
             type="submit"
+            disabled={isLoading}
             style={{
               width: "100%",
               height: 45,
@@ -120,15 +171,20 @@ const SetPassword = () => {
               fontSize: "18px",
               borderRadius: "200px",
               marginTop: 20,
+              opacity: isLoading ? 0.6 : 1,
+              cursor: isLoading ? "not-allowed" : "pointer",
             }}
             className="flex items-center justify-center bg-[#3FAE6A] rounded-lg"
           >
-            Submit
+            {isLoading ? "Resetting..." : "Submit"}
           </button>
         </Form.Item>
       </Form>
       <div className="">
-        <a href="/auth/login" className="flex items-center justify-center gap-1 text-[#667085] hover:text-[#3FAE6A] text-center mt-4">
+        <a
+          href="/auth/login"
+          className="flex items-center justify-center gap-1 text-[#667085] hover:text-[#3FAE6A] text-center mt-4"
+        >
           <ArrowLeft size={20} />
           <p>Back to log in</p>
         </a>

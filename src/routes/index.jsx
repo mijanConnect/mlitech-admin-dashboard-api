@@ -128,7 +128,7 @@ const router = createBrowserRouter([
         element: <ForgotPassword />,
       },
       {
-        path: "verify-otp",
+        path: "otp-verification",
         element: <VerifyOtp />,
       },
       {

@@ -63,7 +63,7 @@ const Login = () => {
           />
         </Form.Item>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-end">
           <a
             className="login-form-forgot text-[#1E1E1E] hover:text-[#3FAE6A] rounded-md font-semibold"
             href="/auth/forgot-password"

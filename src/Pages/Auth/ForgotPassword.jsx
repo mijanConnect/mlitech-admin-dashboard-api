@@ -40,7 +40,7 @@ const ForgotPassword = () => {
 
       <Form layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label={<p>phone</p>}
+          label={<p>Phone Number</p>}
           name="phone"
           id="phone"
           rules={[

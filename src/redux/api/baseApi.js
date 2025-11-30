@@ -43,7 +43,12 @@ const baseUrl = "http://10.10.7.8:5004/api/v1";
 // Attach Access Token to every request
 const rawBaseQuery = fetchBaseQuery({
   baseUrl,
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, { getState }) => {
+    // Skip if Authorization header is already set (for resetToken, etc.)
+    if (headers.has("Authorization")) {
+      return headers;
+    }
+
     const token = tokenService.getAccessToken();
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);

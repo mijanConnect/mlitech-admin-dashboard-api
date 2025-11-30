@@ -3,11 +3,30 @@ import { api } from "../api/baseApi";
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // ---------------------------------------
-    // OTP VERIFY
+    // OTP VERIFY PHONE
+    // Returns: { accessToken, resetToken }
     // ---------------------------------------
     otpVerify: builder.mutation({
       query: (data) => ({
-        url: "/auth/verify-email",
+        url: "/auth/verify-phone",
+        method: "POST",
+        body: data,
+      }),
+      transformResponse: (response) => ({
+        accessToken: response?.data?.accessToken,
+        resetToken: response?.data?.resetToken,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+
+    // ---------------------------------------
+    // RESEND OTP
+    // Endpoint: POST /auth/phone-otp
+    // Body: { phone }
+    // ---------------------------------------
+    resendOtp: builder.mutation({
+      query: (data) => ({
+        url: "/auth/phone-otp",
         method: "POST",
         body: data,
       }),
@@ -26,6 +45,8 @@ export const authApi = api.injectEndpoints({
         },
       }),
       transformResponse: (data) => data,
+
+      providesTags: ["Profile"],
     }),
 
     // ---------------------------------------
@@ -41,18 +62,19 @@ export const authApi = api.injectEndpoints({
 
     // ---------------------------------------
     // RESET PASSWORD
-    // Accepts: { body, headers } OR just body
+    // Uses resetToken in Authorization header
+    // Accepts: { newPassword, confirmPassword, headers }
     // ---------------------------------------
     resetPassword: builder.mutation({
-      query: (value) => {
-        const body = value?.body ?? value;
-        const headers = value?.headers;
-
+      query: (data) => {
+        const { headers, ...body } = data;
+        const finalHeaders = headers || {};
+        
         return {
           url: "/auth/reset-password",
           method: "POST",
           body,
-          ...(headers && { headers }),
+          headers: finalHeaders,
         };
       },
     }),
@@ -99,6 +121,7 @@ export const authApi = api.injectEndpoints({
 
 export const {
   useOtpVerifyMutation,
+  useResendOtpMutation,
   useLoginMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
