@@ -1,22 +1,36 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import JoditEditor from "jodit-react";
 import GradientButton from "../../components/common/GradiantButton";
 import { Button, message, Modal } from "antd";
+import {
+  useGetPrivacyPolicyQuery,
+  useUpdatePrivacyPolicyMutation,
+} from "../../redux/apiSlices/privacyPolicySlice";
 
 const PrivacyPolicy = () => {
   const editor = useRef(null);
 
-  // Using a single state for both content and saved content
-  const [termsContent, setTermsContent] = useState(`
-    <h1><strong>Privacy Policy</strong></h1>
-    <p>Welcome to our website. If you continue to browse and use this website, you are agreeing to comply with and be bound by the following terms and conditions of use.</p> <br />
-    <h3><strong><em>1. General Terms</em></strong></h3>
-    <p>The content of the pages of this website is for your general information and use only. It is subject to change without notice.</p><br />
-    <h3><strong><em>2. Privacy Policy</em></strong></h3>
-    <p>Your use of this website is also subject to our Privacy Policy, which is incorporated by reference.</p><br />
-    <h3><strong><em>3. Disclaimer</em></strong></h3>
-    <p>The information contained in this website is for general information purposes only. We endeavor to keep the information up to date and correct.</p>
-`);
+  const {
+    data: privacyPolicyData,
+    isLoading,
+    isError,
+  } = useGetPrivacyPolicyQuery();
+
+  const [updatePrivacyPolicy, { isLoading: isUpdating }] =
+    useUpdatePrivacyPolicyMutation();
+
+  // Initialize content state from API data or default
+  const [termsContent, setTermsContent] = useState(
+    privacyPolicyData?.data?.content ||
+      "<p>Your privacy policy content goes here.</p>"
+  );
+
+  // Update state when API data loads
+  useEffect(() => {
+    if (privacyPolicyData?.data?.content) {
+      setTermsContent(privacyPolicyData.data.content);
+    }
+  }, [privacyPolicyData?.data?.content]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,10 +38,16 @@ const PrivacyPolicy = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    // When saving, just set the content to the saved state
-    setIsModalOpen(false);
-    message.success("Terms & Conditions updated successfully!");
+  const handleOk = async () => {
+    try {
+      // Send update request to API
+      await updatePrivacyPolicy({ content: termsContent }).unwrap();
+      setIsModalOpen(false);
+      message.success("Privacy Policy updated successfully!");
+    } catch (error) {
+      message.error("Failed to update Privacy Policy");
+      console.error("Update error:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -70,9 +90,10 @@ const PrivacyPolicy = () => {
           <GradientButton
             key="submit"
             onClick={handleOk}
+            disabled={isUpdating}
             className="bg-secondary text-white"
           >
-            Update Privacy Policy
+            {isUpdating ? "Updating..." : "Update Privacy Policy"}
           </GradientButton>,
         ]}
       >

@@ -11,10 +11,6 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const src = user?.image?.startsWith("https")
-    ? user?.image
-    : getImageUrl(user?.image);
-
   const showLogoutConfirm = () => {
     setIsLogoutModalOpen(true);
   };
@@ -82,6 +78,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
             />
           </div>
         </Dropdown>
+
         {/* Notification Icon */}
         <Link to="/notification" className="h-fit mt-[10px]">
           <Badge count={5} backgroundColor="#3FC7EE">
