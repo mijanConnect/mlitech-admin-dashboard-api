@@ -14,7 +14,6 @@ import { People } from "../../components/common/Svg";
 import { Pending } from "../../components/common/Svg";
 import { SubscriptionManagement } from "../../components/common/Svg";
 import BarChart from "./BarChart";
-import { useSearchParams } from "react-router-dom";
 import { useGetStatisticsDataQuery } from "../../redux/apiSlices/homeSlice";
 
 ChartJS.register(
@@ -29,13 +28,13 @@ ChartJS.register(
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("7d");
-  const [searchParams, setSearchParams] = useSearchParams();
 
   // Map display text to API values
   const optionsMap = {
-    "1d": "Today",
+    today: "Today",
     "7d": "Last 7 Days",
     "30d": "Last 30 Days",
+    all: "All Time",
   };
 
   const queryParams = [{ name: "range", value: selected }];
@@ -46,17 +45,25 @@ const Home = () => {
     isError,
   } = useGetStatisticsDataQuery(queryParams);
 
+  console.log(response);
+
+  const options2 = ["today", "7d", "30d", "all"];
+
+  // Handle dropdown change
+  const handleRangeChange = (option) => {
+    setSelected(option);
+    setIsOpen(false);
+  };
+
+  // Show loading state
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
+  // Show error state
   if (isError) {
     return <div>Error loading data.</div>;
   }
-
-  console.log(response);
-
-  const options2 = ["1d", "7d", "30d"];
 
   return (
     <div className="space-y-6">
@@ -88,10 +95,7 @@ const Home = () => {
                   {options2.map((option) => (
                     <li
                       key={option}
-                      onClick={() => {
-                        setSelected(option);
-                        setIsOpen(false);
-                      }}
+                      onClick={() => handleRangeChange(option)}
                       className="cursor-pointer px-4 py-2 text-black hover:bg-primary/10"
                     >
                       {optionsMap[option]}
