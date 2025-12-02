@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ConfigProvider, Pagination } from "antd";
 import {
-  useNotificationQuery,
   useReadMutation,
 } from "../../redux/apiSlices/notificationSlice";
 import toast from "react-hot-toast";
 
 const Notifications = () => {
   const [page, setPage] = useState(1);
-  const { data: notifications } = useNotificationQuery();
   const [read] = useReadMutation();
 
   const handleRead = async () => {
