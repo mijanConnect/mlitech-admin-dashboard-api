@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import JoditEditor from "jodit-react";
-import GradientButton from "../../components/common/GradiantButton";
 import { Button, message, Modal } from "antd";
 import {
   useGetPrivacyPolicyQuery,
@@ -87,14 +86,14 @@ const PrivacyPolicy = () => {
           >
             Cancel
           </Button>,
-          <GradientButton
+          <Button
             key="submit"
             onClick={handleOk}
             disabled={isUpdating}
             className="bg-secondary text-white"
           >
             {isUpdating ? "Updating..." : "Update Privacy Policy"}
-          </GradientButton>,
+          </Button>,
         ]}
       >
         {isModalOpen && (

@@ -3,7 +3,7 @@ import Auth from "../Layout/Auth/Auth";
 import Main from "../Layout/Main/Main";
 import Home from "../Pages/Dashboard/Home";
 import PrivacyPolicy from "../Pages/Dashboard/PrivacyPolicy";
-import TermsAndConditions from "../Pages/Dashboard/TermsAndCondition";
+import TermsAndConditions from "../Pages/Dashboard/TermsAndConditions";
 import ChangePassword from "../Pages/Auth/ChangePassword";
 import Login from "../Pages/Auth/Login";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
