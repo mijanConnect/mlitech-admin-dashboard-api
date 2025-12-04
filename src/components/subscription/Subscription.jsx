@@ -11,6 +11,7 @@ import {
   useGetPackagesQuery,
   useCreatePackageMutation,
   useUpdatePackageMutation,
+  useTogglePackageStatusMutation,
 } from "../../redux/apiSlices/packageSlice";
 import SubscriptionHeadingIcon from "../../assets/subscription-heading.png";
 import Slider from "react-slick";
@@ -27,6 +28,7 @@ const PackagesPlans = () => {
 
   const [createPackage, { isLoading: isCreating }] = useCreatePackageMutation();
   const [updatePackage, { isLoading: isUpdating }] = useUpdatePackageMutation();
+  const [toggleStatus, { isLoading: isToggling }] = useTogglePackageStatusMutation();
 
   // Transform API data to UI format
   const packages = useMemo(() => {
@@ -49,13 +51,14 @@ const PackagesPlans = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPackage, setCurrentPackage] = useState(null);
 
-  const togglePackageStatus = (id) => {
-    // TODO: Implement API mutation for updating package status
-    message.warning("Status update requires API implementation");
-    // setPackages((prev) =>
-    //   prev.map((pkg) => (pkg.id === id ? { ...pkg, active: !pkg.active } : pkg))
-    // );
-    // message.success("Package status updated");
+  const togglePackageStatus = async (id) => {
+    try {
+      await toggleStatus(id).unwrap();
+      message.success("Package status updated successfully!");
+    } catch (error) {
+      console.error("Failed to toggle status:", error);
+      message.error(error?.data?.message || "Failed to toggle package status");
+    }
   };
 
   const showModal = (pkg = null) => {

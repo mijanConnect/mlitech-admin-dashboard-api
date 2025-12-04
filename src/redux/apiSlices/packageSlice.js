@@ -43,6 +43,16 @@ export const PackagesApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Package"],
     }),
+    // ---------------------------------------
+    // TOGGLE package status
+    // ---------------------------------------
+    togglePackageStatus: builder.mutation({
+      query: (id) => ({
+        url: `/package/${id}/toggle`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Package"],
+    }),
   }),
 });
 
@@ -50,4 +60,5 @@ export const {
   useGetPackagesQuery,
   useCreatePackageMutation,
   useUpdatePackageMutation,
+  useTogglePackageStatusMutation,
 } = PackagesApi;
