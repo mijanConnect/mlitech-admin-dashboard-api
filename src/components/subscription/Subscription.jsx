@@ -10,6 +10,7 @@ import EditModal from "./components/EditModal";
 import {
   useGetPackagesQuery,
   useCreatePackageMutation,
+  useUpdatePackageMutation,
 } from "../../redux/apiSlices/packageSlice";
 import SubscriptionHeadingIcon from "../../assets/subscription-heading.png";
 import Slider from "react-slick";
@@ -25,6 +26,7 @@ const PackagesPlans = () => {
   } = useGetPackagesQuery([]);
 
   const [createPackage, { isLoading: isCreating }] = useCreatePackageMutation();
+  const [updatePackage, { isLoading: isUpdating }] = useUpdatePackageMutation();
 
   // Transform API data to UI format
   const packages = useMemo(() => {
@@ -93,14 +95,6 @@ const PackagesPlans = () => {
   };
 
   const handleSubmit = async (values) => {
-    if (isEditing) {
-      // TODO: Implement update API mutation
-      message.warning("Update requires API implementation");
-      setIsModalOpen(false);
-      setCurrentPackage(null);
-      return;
-    }
-
     try {
       const packageData = {
         title: values.title,
@@ -113,14 +107,24 @@ const PackagesPlans = () => {
         features: values.features.filter((f) => f && f.trim() !== ""),
       };
 
-      const result = await createPackage(packageData).unwrap();
+      if (isEditing) {
+        // Update existing package
+        await updatePackage({ id: currentPackage.id, ...packageData }).unwrap();
+        message.success("Package updated successfully!");
+      } else {
+        // Create new package
+        await createPackage(packageData).unwrap();
+        message.success("Package created successfully!");
+      }
 
-      message.success("Package created successfully!");
       setIsModalOpen(false);
       setCurrentPackage(null);
     } catch (error) {
-      console.error("Failed to create package:", error);
-      message.error(error?.data?.message || "Failed to create package");
+      console.error("Failed to save package:", error);
+      message.error(
+        error?.data?.message ||
+          `Failed to ${isEditing ? "update" : "create"} package`
+      );
     }
   };
 

@@ -32,7 +32,22 @@ export const PackagesApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Package"],
     }),
+    // ---------------------------------------
+    // UPDATE package
+    // ---------------------------------------
+    updatePackage: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/package/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Package"],
+    }),
   }),
 });
 
-export const { useGetPackagesQuery, useCreatePackageMutation } = PackagesApi;
+export const {
+  useGetPackagesQuery,
+  useCreatePackageMutation,
+  useUpdatePackageMutation,
+} = PackagesApi;
