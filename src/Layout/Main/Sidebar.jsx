@@ -78,13 +78,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </Link>
       ),
     },
-    {
-      key: "/tierSystem",
-      icon: renderIcon(People, "/tierSystem"),
-      label: (
-        <Link to="/tierSystem">{collapsed ? "" : "Point & Tier System"}</Link>
-      ),
-    },
+    // {
+    //   key: "/tierSystem",
+    //   icon: renderIcon(People, "/tierSystem"),
+    //   label: (
+    //     <Link to="/tierSystem">{collapsed ? "" : "Point & Tier System"}</Link>
+    //   ),
+    // },
     {
       key: "/reportingAnalytics",
       icon: renderIcon(Rewords, "/reportingAnalytics"),

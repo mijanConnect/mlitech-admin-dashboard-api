@@ -1,28 +1,3 @@
-// import React from "react";
-// import { Form } from "antd";
-
-// const FeaturedInput = ({ value = [] }) => {
-//   return (
-//     <Form.List name="features" initialValue={[""]}>
-//       {() => (
-//         <ul className="list-disc pl-5 space-y-2 text-gray-700">
-//           {value.length > 0 ? (
-//             value.map((item, index) => (
-//               <li key={index} className="text-base">
-//                 {item || "—"}
-//               </li>
-//             ))
-//           ) : (
-//             <li className="text-gray-400 italic">No features added</li>
-//           )}
-//         </ul>
-//       )}
-//     </Form.List>
-//   );
-// };
-
-// export default FeaturedInput;
-
 import React from "react";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
@@ -68,10 +43,7 @@ const FeaturedInput = ({ value = [], onChange }) => {
           <Form.Item className="w-full flex justify-center">
             <Button
               type="dashed"
-              onClick={() => {
-                onChange([...value, ""]);
-                add();
-              }}
+              onClick={() => add()}
               icon={<PlusOutlined />}
               className="w-full"
             >

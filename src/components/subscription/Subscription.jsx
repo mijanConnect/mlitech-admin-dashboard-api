@@ -1,144 +1,75 @@
-import React, { useState, useEffect } from "react";
-import { Card, Button, Modal, Form, Input, List, message, Select } from "antd";
+import { useState, useEffect, useMemo } from "react";
+import { Card, Button, List, message } from "antd";
 import {
   EditOutlined,
   PlusOutlined,
   CheckCircleFilled,
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
-import FeaturedInput from "../../components/common/PackageFeatureInput";
-import GradientButton from "../../components/common/GradiantButton";
+import EditModal from "./components/EditModal";
+import {
+  useGetPackagesQuery,
+  useCreatePackageMutation,
+} from "../../redux/apiSlices/packageSlice";
 import SubscriptionHeadingIcon from "../../assets/subscription-heading.png";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const PackagesPlans = () => {
-  const defaultPackages = [
-    {
-      id: 1,
-      title: "Basic Plan",
-      description: "Billed annually.",
-      price: 0,
-      duration: "1 month",
-      features: [
-        "5 User Accounts",
-        "Basic Analytics",
-        "24/7 Support",
-        "10GB Storage",
-        "Email Integration",
-      ],
-      popular: false,
-      active: true,
-    },
-    {
-      id: 2,
-      title: "Gold Plan",
-      description: "Billed annually.",
-      price: 20,
-      duration: "6 months",
-      features: [
-        "25 User Accounts",
-        "Advanced Analytics",
-        "24/7 Priority Support",
-        "50GB Storage",
-        "Email & CRM Integration",
-      ],
-      popular: true,
-      active: false,
-    },
-    {
-      id: 3,
-      title: "Premium Plan",
-      description: "Billed annually.",
-      price: 40,
-      duration: "1 year",
-      features: [
-        "Unlimited User Accounts",
-        "Enterprise Analytics",
-        "Dedicated Account Manager",
-        "Unlimited Storage",
-        "Complete System Integration",
-      ],
-      popular: false,
-      active: true,
-    },
-    {
-      id: 4,
-      title: "Platinum Plan",
-      description: "Billed annually.",
-      price: 60,
-      duration: "1 year",
-      features: [
-        "Unlimited Users",
-        "Premium Analytics",
-        "Dedicated Support",
-        "1TB Storage",
-        "Full Integration",
-      ],
-      popular: false,
-      active: true,
-    },
-    {
-      id: 5,
-      title: "Enterprise Plan",
-      description: "Billed annually.",
-      price: 100,
-      duration: "1 year",
-      features: [
-        "All Users",
-        "Custom Analytics",
-        "Priority Support",
-        "Unlimited Storage",
-        "Custom Integrations",
-      ],
-      popular: true,
-      active: true,
-    },
-  ];
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetPackagesQuery([]);
 
-  const [packages, setPackages] = useState([]);
+  const [createPackage, { isLoading: isCreating }] = useCreatePackageMutation();
+
+  // Transform API data to UI format
+  const packages = useMemo(() => {
+    const items = response?.data || [];
+    return items.map((item) => ({
+      id: item._id,
+      title: item.title,
+      description: item.description,
+      price: item.price,
+      duration: item.duration,
+      features: item.features,
+      popular: item.isFreeTrial || false,
+      active: item.status === "Active",
+      paymentType: item.paymentType,
+      loginLimit: item.loginLimit,
+    }));
+  }, [response]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPackage, setCurrentPackage] = useState(null);
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    setPackages(defaultPackages);
-  }, []);
 
   const togglePackageStatus = (id) => {
-    setPackages((prev) =>
-      prev.map((pkg) => (pkg.id === id ? { ...pkg, active: !pkg.active } : pkg))
-    );
-    message.success("Package status updated");
+    // TODO: Implement API mutation for updating package status
+    message.warning("Status update requires API implementation");
+    // setPackages((prev) =>
+    //   prev.map((pkg) => (pkg.id === id ? { ...pkg, active: !pkg.active } : pkg))
+    // );
+    // message.success("Package status updated");
   };
 
   const showModal = (pkg = null) => {
     setIsEditing(!!pkg);
     setCurrentPackage(pkg);
     setIsModalOpen(true);
-
-    if (pkg) {
-      form.setFieldsValue({
-        title: pkg.title,
-        description: pkg.description,
-        price: Number(pkg.price),
-        duration: pkg.duration,
-        features: pkg.features || [],
-        popular: pkg.popular || false,
-      });
-    } else {
-      form.resetFields();
-    }
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    form.resetFields();
+    setCurrentPackage(null);
   };
 
   const handleDelete = async (id) => {
+    // TODO: Implement API mutation for deleting package
+    message.warning("Delete requires API implementation");
     Swal.fire({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this package!",
@@ -161,31 +92,36 @@ const PackagesPlans = () => {
     });
   };
 
-  const handleSubmit = (values) => {
-    const formattedData = {
-      id: isEditing ? currentPackage.id : Date.now(),
-      title: values.title,
-      description: values.description,
-      price: Number(values.price),
-      duration: values.duration,
-      features: values.features.filter((f) => f.trim() !== ""),
-      popular: values.popular || false,
-    };
-
+  const handleSubmit = async (values) => {
     if (isEditing) {
-      setPackages(
-        packages.map((pkg) =>
-          pkg.id === currentPackage.id ? formattedData : pkg
-        )
-      );
-      message.success("Package updated successfully");
-    } else {
-      setPackages([...packages, formattedData]);
-      message.success("Package added successfully");
+      // TODO: Implement update API mutation
+      message.warning("Update requires API implementation");
+      setIsModalOpen(false);
+      setCurrentPackage(null);
+      return;
     }
 
-    setIsModalOpen(false);
-    form.resetFields();
+    try {
+      const packageData = {
+        title: values.title,
+        description: values.description,
+        price: Number(values.price),
+        duration: values.duration,
+        credit: values.credit ? Number(values.credit) : 0,
+        paymentType: values.paymentType || "Monthly",
+        loginLimit: values.loginLimit ? Number(values.loginLimit) : 1,
+        features: values.features.filter((f) => f && f.trim() !== ""),
+      };
+
+      const result = await createPackage(packageData).unwrap();
+
+      message.success("Package created successfully!");
+      setIsModalOpen(false);
+      setCurrentPackage(null);
+    } catch (error) {
+      console.error("Failed to create package:", error);
+      message.error(error?.data?.message || "Failed to create package");
+    }
   };
 
   const getCardStyle = (pkg) => {
@@ -205,7 +141,7 @@ const PackagesPlans = () => {
     slidesToScroll: 1,
     focusOnSelect: true,
     arrows: true,
-    dots: true, // ✅ Enable dots
+    dots: true,
     customPaging: (i) => (
       <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
     ),
@@ -223,6 +159,35 @@ const PackagesPlans = () => {
       },
     ],
   };
+
+  // Loading and error states
+  if (isLoading || isFetching) {
+    return (
+      <div className="pt-1 px-4">
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading packages...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-1 px-4">
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center text-red-500">
+            <p className="text-lg font-semibold mb-2">Error loading packages</p>
+            <p className="text-sm">
+              {error?.data?.message || "Something went wrong"}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-1 px-4">
@@ -327,99 +292,13 @@ const PackagesPlans = () => {
         </div>
       </div>
 
-      <Modal
-        title={isEditing ? "Edit Package" : "Add Package"}
-        open={isModalOpen}
+      <EditModal
+        isOpen={isModalOpen}
+        isEditing={isEditing}
+        currentPackage={currentPackage}
         onCancel={handleCancel}
-        footer={null}
-        className="rounded-lg"
-        width={600}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          className="flex flex-col gap-4 "
-        >
-          <Form.Item
-            name="title"
-            label="Package Title"
-            rules={[{ required: true, message: "Title is required" }]}
-          >
-            <Input placeholder="e.g. Basic Plan" className="mli-tall-input" />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Description is required" }]}
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Short description of what this package offers"
-              className="mli-tall-input"
-            />
-          </Form.Item>
-
-          <div className="flex gap-4">
-            <Form.Item
-              name="price"
-              label="Price"
-              rules={[{ required: true, message: "Price is required" }]}
-              className="w-1/2"
-            >
-              <Input
-                type="number"
-                prefix="$"
-                placeholder="29.99"
-                className="mli-tall-input"
-              />
-            </Form.Item>
-            <Form.Item
-              name="duration"
-              label="Duration"
-              rules={[{ required: true, message: "Duration is required" }]}
-              className="w-1/2"
-            >
-              <Select placeholder="Select duration" className="mli-tall-select">
-                <Select.Option value="1 month">1 Month</Select.Option>
-                <Select.Option value="1 month">3 Months</Select.Option>
-                <Select.Option value="1 month">4 Months</Select.Option>
-                <Select.Option value="1 month">6 Months</Select.Option>
-                <Select.Option value="3 months">8 Months</Select.Option>
-                <Select.Option value="3 months">12 Months</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            name="features"
-            label="Features"
-            rules={[
-              { required: true, message: "At least one feature is required" },
-            ]}
-          >
-            <FeaturedInput />
-          </Form.Item>
-
-          <div className="flex justify-end gap-3 mt-6">
-            <Button
-              onClick={handleCancel}
-              size="large"
-              className="border border-primary hover:!border-primary hover:!text-primary"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-primary text-white rounded-lg hover:bg-[#012F60] transition-all h-auto py-2 px-6"
-              size="large"
-            >
-              {isEditing ? "Update Package" : "Add Package"}
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

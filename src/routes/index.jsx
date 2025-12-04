@@ -12,7 +12,7 @@ import NotFound from "../NotFound";
 import Notifications from "../Pages/Dashboard/Notifications";
 import AdminProfile from "../Pages/Dashboard/AdminProfile/AdminProfile";
 import LoyaltyProgram from "../Pages/Dashboard/LoyaltyProgram";
-import PackagesPlans from "../Pages/Dashboard/Subscription";
+import PackagesPlans from "../components/subscription/Subscription";
 import Contact from "../Pages/Dashboard/Contact";
 import ResetSuccess from "../Pages/Auth/ResetSuccess";
 import SetPassword from "../Pages/Auth/SetPassword";
