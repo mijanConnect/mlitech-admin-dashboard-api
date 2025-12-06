@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import GradientButton from "./GradiantButton";
+import { Button } from "antd";
+import { useState, useEffect } from "react";
 
 const UpdateModal = ({ isOpen, onClose, onSave, userData, editingId }) => {
   if (!isOpen) return null;
@@ -108,9 +108,9 @@ const UpdateModal = ({ isOpen, onClose, onSave, userData, editingId }) => {
           <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">
             Cancel
           </button>
-          <GradientButton onClick={handleSubmit}>
+          <Button onClick={handleSubmit}>
             {isEditMode ? "Update" : "Add"}
-          </GradientButton>
+          </Button>
         </div>
       </div>
     </div>

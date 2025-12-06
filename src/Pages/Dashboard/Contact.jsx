@@ -3,7 +3,6 @@ import { Modal, Form, Input, Button, Flex, message } from "antd";
 import { LiaPhoneVolumeSolid } from "react-icons/lia";
 import { PiMapPinAreaLight } from "react-icons/pi";
 import { CiMail } from "react-icons/ci";
-import GradientButton from "../../components/common/GradiantButton";
 
 const Contact = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,6 +1,13 @@
-import React, { useState } from "react";
-import { Table, Button, Modal, Input, Select, Form, ConfigProvider } from "antd";
-import GradientButton from "../common/GradiantButton";
+import { useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Input,
+  Select,
+  Form,
+  ConfigProvider,
+} from "antd";
 
 const { Option } = Select;
 
@@ -10,7 +17,6 @@ const LoyalityProgramTable = () => {
     useState(false);
   const [form] = Form.useForm();
 
-  
   const data = [
     {
       key: "1",
@@ -48,7 +54,6 @@ const LoyalityProgramTable = () => {
       tier: "500",
       eligibility: "No",
     },
-   
   ];
 
   const columns = [
@@ -67,7 +72,6 @@ const LoyalityProgramTable = () => {
       align: "center",
     },
     { title: "Total Points", dataIndex: "tier", key: "tier", align: "center" },
-    
   ];
 
   return (
@@ -75,9 +79,9 @@ const LoyalityProgramTable = () => {
       <div className="flex justify-between items-center mb-10">
         <h2 className="text-2xl font-bold">LeaderBoard</h2>
         {/* <div>
-          <GradientButton onClick={() => setIsAddTierModalOpen(true)}>
+          <Button onClick={() => setIsAddTierModalOpen(true)}>
             Add Tier
-          </GradientButton>
+          </Button>
           <ConfigProvider
             theme={{
               token: {
@@ -86,11 +90,11 @@ const LoyalityProgramTable = () => {
               },
             }}
           >
-            <GradientButton
+            <Button
               onClick={() => setIsManageEligibilityModalOpen(true)}
             >
               Manage Tier & Eligibility
-            </GradientButton>
+            </Button>
           </ConfigProvider>
         </div> */}
       </div>

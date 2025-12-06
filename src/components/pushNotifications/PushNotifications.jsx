@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import JoditEditor from "jodit-react";
-import GradientButton from "../../components/common/GradiantButton";
 import { Button, Input, message, Select } from "antd";
 import { Row, Col } from "antd";
 
