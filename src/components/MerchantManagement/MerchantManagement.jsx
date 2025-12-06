@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import AddEditModal from "./components/AddEditModal";
 import ViewModal from "./components/ViewModal";
-import { useGetMerchantProfileQuery } from "../../redux/apiSlices/merchantSlic";
+import {
+  useGetMerchantProfileQuery,
+  useDeleteMerchantMutation,
+} from "../../redux/apiSlices/merchantSlic";
 import MerchantTableColumn from "./components/MerchantTableColumn";
 
 const MerchantManagement = () => {
@@ -32,13 +35,17 @@ const MerchantManagement = () => {
     error,
   } = useGetMerchantProfileQuery(queryParams);
 
+  const [deleteMerchant, { isLoading: isDeleting }] =
+    useDeleteMerchantMutation();
+
   console.log(response);
 
   const tableData = useMemo(() => {
     const items = response?.data || [];
     return items.map((item, index) => ({
       key: item._id,
-      id: index + 1 + (page - 1) * limit,
+      recordId: item._id,
+      sl: index + 1 + (page - 1) * limit,
       merchantCardId: item.merchantCardId || "-",
       businessName: item.businessName || "-",
       phone: item.phone || "-",
@@ -163,8 +170,33 @@ const MerchantManagement = () => {
     }
   };
 
-  const handleDelete = (recordId) => {
-    setData((prev) => prev.filter((item) => item.id !== recordId));
+  const handleDelete = async (recordId) => {
+    console.log("Delete handler invoked for", recordId);
+    if (!recordId) {
+      message.error("No merchant id found for deletion");
+      return;
+    }
+    const target = response?.data?.find((m) => m._id === recordId);
+
+    Swal.fire({
+      title: "Delete merchant?",
+      text: `This will remove ${target?.businessName || "this merchant"}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      try {
+        await deleteMerchant(recordId).unwrap();
+        message.success("Merchant deleted successfully");
+      } catch (err) {
+        console.error("Delete merchant failed", err);
+        message.error(err?.data?.message || "Failed to delete merchant");
+      }
+    });
   };
 
   const handleStatusChange = (recordId, newStatus) => {

@@ -18,7 +18,7 @@ const MerchantTableColumn = ({
   onReject,
 }) => {
   const columnsWithActions = [
-    { title: "SL", dataIndex: "id", key: "id", align: "center" },
+    { title: "SL", dataIndex: "sl", key: "sl", align: "center" },
     {
       title: "Merchant Card ID",
       dataIndex: "merchantCardId",
@@ -102,14 +102,14 @@ const MerchantTableColumn = ({
           return (
             <div className="flex gap-2 justify-center items-center py-[7px] px-[15px]">
               <button
-                onClick={() => onApprove(record.id)}
+                onClick={() => onApprove(record.recordId || record.id)}
                 className="bg-green-500 text-white px-3 py-1 rounded-md hover:opacity-90"
               >
                 Add
               </button>
 
               <button
-                onClick={() => onReject(record.id)}
+                onClick={() => onReject(record.recordId || record.id)}
                 className="bg-red-500 text-white px-3 py-1 rounded-md hover:opacity-90"
               >
                 Reject
@@ -144,26 +144,7 @@ const MerchantTableColumn = ({
 
             <Tooltip title="Delete">
               <button
-                onClick={() => {
-                  Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!",
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      onDelete(record.id);
-                      Swal.fire({
-                        title: "Deleted!",
-                        text: "Your record has been deleted.",
-                        icon: "success",
-                      });
-                    }
-                  });
-                }}
+                onClick={() => onDelete(record.recordId || record.id)}
                 className="text-red-500 hover:text-red-700 text-md"
               >
                 <FaTrash />
@@ -190,7 +171,10 @@ const MerchantTableColumn = ({
                   confirmButtonText: "Yes, change it!",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    onStatusChange(record.id, checked ? "Active" : "Inactive");
+                    onStatusChange(
+                      record.recordId || record.id,
+                      checked ? "Active" : "Inactive"
+                    );
                     Swal.fire({
                       title: "Updated!",
                       text: `Status has been changed to ${

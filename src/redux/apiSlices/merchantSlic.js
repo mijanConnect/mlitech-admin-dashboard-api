@@ -21,7 +21,17 @@ export const merchantApi = api.injectEndpoints({
       transformResponse: (response) => response,
       providesTags: ["Merchant"],
     }),
+    // ---------------------------------------
+    // DELETE merchant
+    // ---------------------------------------
+    deleteMerchant: builder.mutation({
+      query: (id) => ({
+        url: `/admin/merchants/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Merchant"],
+    }),
   }),
 });
 
-export const { useGetMerchantProfileQuery } = merchantApi;
+export const { useGetMerchantProfileQuery, useDeleteMerchantMutation } = merchantApi;
