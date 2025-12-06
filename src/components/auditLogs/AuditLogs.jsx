@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import { Table, Button, Modal, Form, Input, Tooltip, Switch } from "antd";
+import { useState } from "react";
+import { Table, Modal, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
-import { FaTrash } from "react-icons/fa";
-import { IoEyeSharp } from "react-icons/io5";
-import Swal from "sweetalert2";
 import MarchantIcon from "../../assets/exclemetion.png";
 
 const components = {
