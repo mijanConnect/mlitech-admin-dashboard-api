@@ -42,43 +42,43 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/merchantManagement",
+        path: "/merchant-management",
         element: <MerchantManagement />,
       },
       {
-        path: "/customerManagement",
+        path: "/customer-management",
         element: <CustomerManagement />,
       },
       {
-        path: "/tierSystem",
+        path: "/tier-system",
         element: <TierSystem />,
       },
       {
-        path: "/promotionManagement",
+        path: "/promotion-management",
         element: <PromotionManagement />,
       },
       {
-        path: "/salesRepPortal",
+        path: "/sales-rep-portal",
         element: <SalesRepPortal />,
       },
       {
-        path: "/auditLogs",
+        path: "/audit-logs",
         element: <AuditLogs />,
       },
       {
-        path: "/userManagement",
+        path: "/user-management",
         element: <LoginCredentials />,
       },
       {
-        path: "/reportingAnalytics",
+        path: "/reporting-analytics",
         element: <ReportingAnalytics />,
       },
       {
-        path: "/pushNotification",
+        path: "/push-notification",
         element: <PushNotifications />,
       },
       {
-        path: "/loyaltyProgram",
+        path: "/loyalty-program",
         element: <LoyaltyProgram />,
       },
       {

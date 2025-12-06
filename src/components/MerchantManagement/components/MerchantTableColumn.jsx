@@ -56,24 +56,24 @@ const MerchantTableColumn = ({
       key: "totalSales",
       align: "center",
     },
-    {
-      title: "Total Points Earned",
-      dataIndex: "totalPointsEarned",
-      key: "totalPointsEarned",
-      align: "center",
-    },
-    {
-      title: "Total Points Redeemed",
-      dataIndex: "totalPointsRedeemed",
-      key: "totalPointsRedeemed",
-      align: "center",
-    },
-    {
-      title: "Total Points Pending",
-      dataIndex: "totalPointsPending",
-      key: "totalPointsPending",
-      align: "center",
-    },
+    // {
+    //   title: "Total Points Earned",
+    //   dataIndex: "totalPointsEarned",
+    //   key: "totalPointsEarned",
+    //   align: "center",
+    // },
+    // {
+    //   title: "Total Points Redeemed",
+    //   dataIndex: "totalPointsRedeemed",
+    //   key: "totalPointsRedeemed",
+    //   align: "center",
+    // },
+    // {
+    //   title: "Total Points Pending",
+    //   dataIndex: "totalPointsPending",
+    //   key: "totalPointsPending",
+    //   align: "center",
+    // },
     {
       title: "Total Visits",
       dataIndex: "totalVisits",

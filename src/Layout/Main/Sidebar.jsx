@@ -61,35 +61,35 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       label: <Link to="/">{collapsed ? "" : "Dashboard Overview"}</Link>,
     },
     {
-      key: "/merchantManagement",
-      icon: renderIcon(Marchant, "/merchantManagement"),
+      key: "/merchant-management",
+      icon: renderIcon(Marchant, "/merchant-management"),
       label: (
-        <Link to="/merchantManagement">
+        <Link to="/merchant-management">
           {collapsed ? "" : "Merchant Management"}
         </Link>
       ),
     },
     {
-      key: "/customerManagement",
-      icon: renderIcon(People, "/customerManagement"),
+      key: "/customer-management",
+      icon: renderIcon(People, "/customer-management"),
       label: (
-        <Link to="/customerManagement">
+        <Link to="/customer-management">
           {collapsed ? "" : "Customer Profile"}
         </Link>
       ),
     },
     // {
-    //   key: "/tierSystem",
-    //   icon: renderIcon(People, "/tierSystem"),
+    //   key: "/tier-system",
+    //   icon: renderIcon(People, "/tier-system"),
     //   label: (
-    //     <Link to="/tierSystem">{collapsed ? "" : "Point & Tier System"}</Link>
+    //     <Link to="/tier-system">{collapsed ? "" : "Point & Tier System"}</Link>
     //   ),
     // },
     {
-      key: "/reportingAnalytics",
-      icon: renderIcon(Rewords, "/reportingAnalytics"),
+      key: "/reporting-analytics",
+      icon: renderIcon(Rewords, "/reporting-analytics"),
       label: (
-        <Link to="/reportingAnalytics">
+        <Link to="/reporting-analytics">
           {collapsed ? "" : "Reporting & Analytics"}
         </Link>
       ),
@@ -104,25 +104,25 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       ),
     },
     {
-      key: "/promotionManagement",
-      icon: renderIcon(PromotionManagement, "/promotionManagement"),
+      key: "/promotion-management",
+      icon: renderIcon(PromotionManagement, "/promotion-management"),
       label: (
-        <Link to="/promotionManagement">
+        <Link to="/promotion-management">
           {collapsed ? "" : "Promotion Management"}
         </Link>
       ),
     },
     {
-      key: "/salesRepPortal",
-      icon: renderIcon(SalesRep, "/salesRepPortal"),
+      key: "/sales-rep-portal",
+      icon: renderIcon(SalesRep, "/sales-rep-portal"),
       label: (
-        <Link to="/salesRepPortal">{collapsed ? "" : "Sales Rep Portal"}</Link>
+        <Link to="/sales-rep-portal">{collapsed ? "" : "Sales Rep Portal"}</Link>
       ),
     },
     {
-      key: "/auditLogs",
-      icon: renderIcon(AuditLog, "/auditLogs"),
-      label: <Link to="/auditLogs">{collapsed ? "" : "Audit Logs"}</Link>,
+      key: "/audit-logs",
+      icon: renderIcon(AuditLog, "/audit-logs"),
+      label: <Link to="/audit-logs">{collapsed ? "" : "Audit Logs"}</Link>,
     },
     // {
     //   key: "/userManagement",
@@ -132,10 +132,10 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     //   ),
     // },
     {
-      key: "/pushNotification",
-      icon: renderIcon(loginCredentials, "/pushNotification"),
+      key: "/push-notification",
+      icon: renderIcon(loginCredentials, "/push-notification"),
       label: (
-        <Link to="/pushNotification">
+        <Link to="/push-notification">
           {collapsed ? "" : "Push Notifications"}
         </Link>
       ),
@@ -150,9 +150,9 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           label: <Link to="/profile">{collapsed ? "" : "Update Profile"}</Link>,
         },
         {
-          key: "/userManagement",
+          key: "/user-management",
           label: (
-            <Link to="/userManagement">
+            <Link to="/user-management">
               {collapsed ? "" : "User Management"}
             </Link>
           ),

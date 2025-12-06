@@ -34,4 +34,5 @@ export const merchantApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetMerchantProfileQuery, useDeleteMerchantMutation } = merchantApi;
+export const { useGetMerchantProfileQuery, useDeleteMerchantMutation } =
+  merchantApi;

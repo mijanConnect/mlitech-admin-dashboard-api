@@ -7,7 +7,7 @@ import ViewModal from "./components/ViewModal";
 import {
   useGetMerchantProfileQuery,
   useDeleteMerchantMutation,
-} from "../../redux/apiSlices/merchantSlic";
+} from "../../redux/apiSlices/merchantSlice";
 import MerchantTableColumn from "./components/MerchantTableColumn";
 
 const MerchantManagement = () => {
