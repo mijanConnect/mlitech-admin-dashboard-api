@@ -1,5 +1,3 @@
-import React from "react";
-import { LuBadgeDollarSign } from "react-icons/lu";
 import { FaUsers } from "react-icons/fa6";
 
 const LoyalityCard = () => {
