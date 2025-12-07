@@ -8,6 +8,7 @@ import {
   useGetMerchantProfileQuery,
   useDeleteMerchantMutation,
   useUpdateMerchantApprovalStatusMutation,
+  useUpdateMerchantStatusMutation,
 } from "../../redux/apiSlices/merchantSlice";
 import MerchantTableColumn from "./components/MerchantTableColumn";
 
@@ -40,6 +41,8 @@ const MerchantManagement = () => {
     useDeleteMerchantMutation();
   const [updateApprovalStatus, { isLoading: isUpdatingApproval }] =
     useUpdateMerchantApprovalStatusMutation();
+  const [updateMerchantStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateMerchantStatusMutation();
 
   console.log(response);
 
@@ -203,12 +206,17 @@ const MerchantManagement = () => {
     });
   };
 
-  const handleStatusChange = (recordId, newStatus) => {
-    setData((prev) =>
-      prev.map((item) =>
-        item.id === recordId ? { ...item, status: newStatus } : item
-      )
-    );
+  const handleStatusChange = async (recordId, newStatus) => {
+    try {
+      await updateMerchantStatus({
+        id: recordId,
+        status: newStatus === "Active" ? "active" : "inactive",
+      }).unwrap();
+      message.success(`Merchant status updated to ${newStatus}`);
+    } catch (err) {
+      console.error("Status update failed", err);
+      message.error(err?.data?.message || "Failed to update status");
+    }
   };
 
   const handleApproveMerchant = async (recordId) => {

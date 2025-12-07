@@ -42,6 +42,17 @@ export const merchantApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Merchant"],
     }),
+    // ---------------------------------------
+    // UPDATE merchant status (active/inactive)
+    // ---------------------------------------
+    updateMerchantStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/merchants/status/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["Merchant"],
+    }),
   }),
 });
 
@@ -49,4 +60,5 @@ export const {
   useGetMerchantProfileQuery,
   useDeleteMerchantMutation,
   useUpdateMerchantApprovalStatusMutation,
+  useUpdateMerchantStatusMutation,
 } = merchantApi;
