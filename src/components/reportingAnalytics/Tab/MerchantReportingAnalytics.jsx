@@ -484,10 +484,13 @@ export default function MonthlyStatsChartMerchant() {
                       setSelectedMetric("all");
                       setChartType("Bar");
                     }}
+                    className="bg-red-500 !border-red-500 px-6 py-[19px] rounded-md text-white hover:!text-red-500 text-[14px] font-bold"
                   >
                     Clear Selection
                   </Button>
-                  <Button>Export Report</Button>
+                  <Button className="bg-primary px-6 py-[19px] rounded-md text-white hover:text-secondary text-[14px] font-bold">
+                    Export Report
+                  </Button>
                 </div>
               </Form.Item>
             </Col>
