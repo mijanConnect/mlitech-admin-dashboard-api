@@ -7,6 +7,7 @@ import ViewModal from "./components/ViewModal";
 import {
   useGetMerchantProfileQuery,
   useDeleteMerchantMutation,
+  useUpdateMerchantApprovalStatusMutation,
 } from "../../redux/apiSlices/merchantSlice";
 import MerchantTableColumn from "./components/MerchantTableColumn";
 
@@ -37,6 +38,8 @@ const MerchantManagement = () => {
 
   const [deleteMerchant, { isLoading: isDeleting }] =
     useDeleteMerchantMutation();
+  const [updateApprovalStatus, { isLoading: isUpdatingApproval }] =
+    useUpdateMerchantApprovalStatusMutation();
 
   console.log(response);
 
@@ -59,6 +62,7 @@ const MerchantManagement = () => {
       totalVisits: item.totalVisits || 0,
       status: item.status === "active" ? "Active" : "Inactive",
       ratings: item.ratings || 0,
+      approveStatus: item.approveStatus || "pending",
       raw: item,
     }));
   }, [response, page, limit]);
@@ -207,36 +211,30 @@ const MerchantManagement = () => {
     );
   };
 
-  const handleApproveMerchant = (recordId) => {
-    setData((prev) =>
-      prev.map((item) =>
-        item.id === recordId ? { ...item, status: "Active" } : item
-      )
-    );
-    message.success("Merchant approved and added.");
+  const handleApproveMerchant = async (recordId) => {
+    try {
+      await updateApprovalStatus({
+        id: recordId,
+        approveStatus: "approved",
+      }).unwrap();
+      message.success("Merchant approved successfully!");
+    } catch (err) {
+      console.error("Approve failed", err);
+      message.error(err?.data?.message || "Failed to approve merchant");
+    }
   };
 
-  const handleRejectMerchant = (recordId) => {
-    Swal.fire({
-      title: "Reject merchant?",
-      text: "This will remove the merchant from the list.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, reject",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setData((prev) => prev.filter((item) => item.id !== recordId));
-        Swal.fire({
-          title: "Rejected",
-          text: "Merchant has been rejected and removed.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      }
-    });
+  const handleRejectMerchant = async (recordId) => {
+    try {
+      await updateApprovalStatus({
+        id: recordId,
+        approveStatus: "rejected",
+      }).unwrap();
+      message.success("Merchant rejected!");
+    } catch (err) {
+      console.error("Reject failed", err);
+      message.error(err?.data?.message || "Failed to reject merchant");
+    }
   };
 
   return (

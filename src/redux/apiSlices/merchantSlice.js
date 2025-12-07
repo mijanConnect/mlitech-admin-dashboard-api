@@ -31,8 +31,22 @@ export const merchantApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Merchant"],
     }),
+    // ---------------------------------------
+    // UPDATE merchant approval status
+    // ---------------------------------------
+    updateMerchantApprovalStatus: builder.mutation({
+      query: ({ id, approveStatus }) => ({
+        url: `/admin/merchants/${id}`,
+        method: "PATCH",
+        body: { approveStatus },
+      }),
+      invalidatesTags: ["Merchant"],
+    }),
   }),
 });
 
-export const { useGetMerchantProfileQuery, useDeleteMerchantMutation } =
-  merchantApi;
+export const {
+  useGetMerchantProfileQuery,
+  useDeleteMerchantMutation,
+  useUpdateMerchantApprovalStatusMutation,
+} = merchantApi;

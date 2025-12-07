@@ -98,7 +98,7 @@ const MerchantTableColumn = ({
       align: "center",
       render: (_, record) => {
         // If merchant is pending show Add and Reject actions
-        if (record.status === "Pending") {
+        if (record.approveStatus === "pending") {
           return (
             <div className="flex gap-2 justify-center items-center py-[7px] px-[15px]">
               <button
@@ -116,6 +116,11 @@ const MerchantTableColumn = ({
               </button>
             </div>
           );
+        }
+
+        // if approval is rejected show Rejected text
+        if (record.approveStatus === "rejected") {
+          return <span className="text-red-500 font-semibold">Rejected</span>;
         }
 
         // Otherwise show the regular action set
