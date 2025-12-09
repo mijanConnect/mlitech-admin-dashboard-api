@@ -98,26 +98,7 @@ const CustomerTableColumn = ({
 
           <Tooltip title="Delete">
             <button
-              onClick={() => {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    onDelete(record.id);
-                    Swal.fire({
-                      title: "Deleted!",
-                      text: "Your record has been deleted.",
-                      icon: "success",
-                    });
-                  }
-                });
-              }}
+              onClick={() => onDelete(record.recordId || record.id)}
               className="text-red-500 hover:text-red-700 text-md"
             >
               <FaTrash />

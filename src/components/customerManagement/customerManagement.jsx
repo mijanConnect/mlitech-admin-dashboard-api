@@ -6,7 +6,10 @@ import Swal from "sweetalert2";
 import EditModal from "./components/EditModal";
 import ViewModal from "./components/ViewModal";
 import { useSearchParams } from "react-router-dom";
-import { useGetCustomerProfileQuery } from "../../redux/apiSlices/customerSlice";
+import {
+  useGetCustomerProfileQuery,
+  useDeleteCustomerMutation,
+} from "../../redux/apiSlices/customerSlice";
 import CustomerTableColumn from "./components/CustomerTableColumn";
 
 const CustomerManagement = () => {
@@ -34,12 +37,16 @@ const CustomerManagement = () => {
     error,
   } = useGetCustomerProfileQuery(queryParams);
 
+  const [deleteCustomer, { isLoading: isDeleting }] =
+    useDeleteCustomerMutation();
+
   console.log(response);
 
   const tableData = useMemo(() => {
     const items = response?.data || [];
     return items.map((item, index) => ({
       key: item._id,
+      recordId: item._id,
       id: index + 1 + (page - 1) * limit,
       customerId: item.customerId || "-",
       customerName: item.firstName || "-",
@@ -125,8 +132,32 @@ const CustomerManagement = () => {
     Swal.fire("Updated!", "The customer details were updated.", "success");
   };
 
-  const handleDelete = (recordId) => {
-    setTableData((prev) => prev.filter((item) => item.id !== recordId));
+  const handleDelete = async (recordId) => {
+    const target = response?.data?.find((c) => c._id === recordId);
+
+    Swal.fire({
+      title: "Delete customer?",
+      text: `This will remove ${target?.firstName || "this customer"}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      try {
+        await deleteCustomer(recordId).unwrap();
+        Swal.fire("Deleted!", "Customer has been deleted.", "success");
+      } catch (err) {
+        console.error("Delete customer failed", err);
+        Swal.fire(
+          "Error!",
+          err?.data?.message || "Failed to delete customer",
+          "error"
+        );
+      }
+    });
   };
 
   const handleStatusChange = (recordId, newStatus) => {

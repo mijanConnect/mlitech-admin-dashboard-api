@@ -21,7 +21,17 @@ export const customerApi = api.injectEndpoints({
       transformResponse: (response) => response,
       providesTags: ["Customer"],
     }),
+    // ---------------------------------------
+    // DELETE customer
+    // ---------------------------------------
+    deleteCustomer: builder.mutation({
+      query: (id) => ({
+        url: `/admin/customers/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Customer"],
+    }),
   }),
 });
 
-export const { useGetCustomerProfileQuery } = customerApi;
+export const { useGetCustomerProfileQuery, useDeleteCustomerMutation } = customerApi;
