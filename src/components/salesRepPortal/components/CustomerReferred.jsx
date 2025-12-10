@@ -1,36 +1,9 @@
 import React, { useState } from "react";
-import { Table, Modal, Tooltip } from "antd";
+import { Modal } from "antd";
 import Swal from "sweetalert2";
 import NewCampaign from "../../promotionManagement/components/NewCampaing.jsx";
 import { CopyOutlined } from "@ant-design/icons";
-
-const components = {
-  header: {
-    row: (props) => (
-      <tr
-        {...props}
-        style={{
-          backgroundColor: "#f0f5f9",
-          height: "50px",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-    cell: (props) => (
-      <th
-        {...props}
-        style={{
-          fontWeight: "bold",
-          fontSize: "18px",
-          textAlign: "center",
-          padding: "12px",
-        }}
-      />
-    ),
-  },
-};
+import CustomerReferredTableColumn from "./CustomerReferredTableColumn.jsx";
 
 const CustomerReferred = () => {
   const [data, setData] = useState([
@@ -42,7 +15,7 @@ const CustomerReferred = () => {
       salesRep: "Rep 1",
       paymentStatus: "Paid",
       actionStatus: "Inactive",
-      status: "Active",
+      status: "active",
       statusProgress: 0, // 0 = only Acknowledge, 1 = Activate, 2 = Generate Token
       acknowledgeDate: null, // Added to store acknowledge date
       generatedToken: "", // Added to store generated token
@@ -57,7 +30,7 @@ const CustomerReferred = () => {
       salesRep: "Rep 2",
       paymentStatus: "Unpaid",
       actionStatus: "Inactive",
-      status: "Inactive",
+      status: "inactive",
       statusProgress: 0,
       acknowledgeDate: null,
       generatedToken: "",
@@ -72,7 +45,7 @@ const CustomerReferred = () => {
       salesRep: "Rep 3",
       paymentStatus: "Paid",
       actionStatus: "Active",
-      status: "Active",
+      status: "active",
       statusProgress: 2,
       acknowledgeDate: "2025-09-20", // Sample date
       generatedToken: "ABC12345",
@@ -87,7 +60,7 @@ const CustomerReferred = () => {
       salesRep: "Rep 4",
       paymentStatus: "Paid",
       actionStatus: "Inactive",
-      status: "Inactive",
+      status: "inactive",
       statusProgress: 1,
       acknowledgeDate: "2025-09-15", // Sample date
       generatedToken: "",
@@ -104,15 +77,21 @@ const CustomerReferred = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [referralID, setReferralID] = useState("ANDREW856 D");
 
-  // Show Acknowledge Cash Payment modal
-  const showViewModal = (record) => {
+  // Handle Acknowledge Cash Payment
+  const handleAcknowledge = (record) => {
     setSelectedRecord(record);
     setIsViewModalVisible(true);
 
-    // Step progress to 1 (Activate User enabled)
+    // Update record with acknowledge date and progress status
     setData((prevData) =>
       prevData.map((item) =>
-        item.id === record.id ? { ...item, statusProgress: 1 } : item
+        item.id === record.id
+          ? {
+              ...item,
+              statusProgress: 1,
+              acknowledgeDate: new Date().toLocaleDateString(),
+            }
+          : item
       )
     );
   };
@@ -143,15 +122,20 @@ const CustomerReferred = () => {
   };
 
   // Generate Cash Token
-  const handleGenerateToken = () => {
+  const handleGenerateToken = (record) => {
+    setSelectedRecord(record);
     const token = Math.random().toString(36).substring(2, 10).toUpperCase();
     setGeneratedToken(token);
 
     // Set generated token in the selected record
     setData((prevData) =>
       prevData.map((item) =>
-        item.id === selectedRecord.id
-          ? { ...item, generatedToken: token, tokenGeneratedDate: new Date() }
+        item.id === record.id
+          ? {
+              ...item,
+              generatedToken: token,
+              tokenGeneratedDate: new Date().toLocaleDateString(),
+            }
           : item
       )
     );
@@ -171,14 +155,14 @@ const CustomerReferred = () => {
 
   // Toggle user active/inactive
   const handleToggleUserStatus = (record) => {
-    const isCurrentlyActive = record.actionStatus === "Active";
+    const isCurrentlyActive = record.status === "active";
 
     Swal.fire({
       title: isCurrentlyActive
         ? "Deactivate this user?"
         : "Activate this user?",
       text: `This will set the user status to ${
-        isCurrentlyActive ? "Inactive" : "Active"
+        isCurrentlyActive ? "inactive" : "active"
       }.`,
       icon: "warning",
       showCancelButton: true,
@@ -194,9 +178,10 @@ const CustomerReferred = () => {
             item.id === record.id
               ? {
                   ...item,
+                  status: isCurrentlyActive ? "inactive" : "active",
                   actionStatus: isCurrentlyActive ? "Inactive" : "Active",
                   statusProgress: 2, // Generate Token enabled
-                  activateDate: new Date(),
+                  activateDate: new Date().toLocaleDateString(),
                 }
               : item
           )
@@ -205,129 +190,13 @@ const CustomerReferred = () => {
         Swal.fire({
           title: isCurrentlyActive ? "Deactivated!" : "Activated!",
           text: `User has been set to ${
-            isCurrentlyActive ? "Inactive" : "Active"
+            isCurrentlyActive ? "inactive" : "active"
           }.`,
           icon: "success",
         });
       }
     });
   };
-
-  const columns = [
-    { title: "SL", dataIndex: "id", key: "id", align: "center" },
-    {
-      title: "Customer Name",
-      dataIndex: "customerName",
-      key: "customerName",
-      align: "center",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-      align: "center",
-    },
-    {
-      title: "Sales Rep",
-      dataIndex: "salesRep",
-      key: "salesRep",
-      align: "center",
-    },
-    { title: "Email", dataIndex: "email", key: "email", align: "center" },
-    {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      align: "center",
-    },
-    {
-      title: "Account Status",
-      dataIndex: "actionStatus",
-      key: "actionStatus",
-      align: "center",
-    },
-    {
-      title: "Action",
-      key: "action",
-      align: "center",
-      render: (_, record) => (
-        <div className="flex justify-center items-center gap-2">
-          <div className="border border-primary rounded-md px-2 py-2 flex gap-2">
-            <Tooltip title="Acknowledge cash payment">
-              <button
-                onClick={() => {
-                  showViewModal(record);
-                  setData((prevData) =>
-                    prevData.map((item) =>
-                      item.id === record.id
-                        ? { ...item, acknowledgeDate: new Date() }
-                        : item
-                    )
-                  );
-                }}
-                disabled={record.statusProgress > 0}
-                className={`text-secondary border border-primary rounded-md px-2 py-1 bg-[#D7F4DE] ${
-                  record.statusProgress > 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                {record.acknowledgeDate
-                  ? `Acknowledged on ${new Date(
-                      record.acknowledgeDate
-                    ).toLocaleDateString()}`
-                  : "Acknowledge cash payment"}
-              </button>
-            </Tooltip>
-
-            <Tooltip
-              title={
-                record.actionStatus === "Active"
-                  ? "Deactivate User"
-                  : "Activate User"
-              }
-            >
-              <button
-                onClick={() => handleToggleUserStatus(record)}
-                disabled={record.statusProgress < 1}
-                className={`text-secondary border border-primary rounded-md px-2 py-1 bg-[#D7F4DE] ${
-                  record.statusProgress < 1
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                {record.activateDate
-                  ? `Activated on ${new Date(
-                      record.activateDate
-                    ).toLocaleDateString()}`
-                  : record.actionStatus === "Active"
-                  ? "Deactivate User"
-                  : "Activate User"}
-              </button>
-            </Tooltip>
-
-            <Tooltip title="Generate a cash token">
-              <button
-                onClick={handleGenerateToken}
-                disabled={record.statusProgress < 2}
-                className={`text-secondary border border-primary rounded-md px-2 py-1 bg-[#D7F4DE] ${
-                  record.statusProgress < 2
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                {record.tokenGeneratedDate
-                  ? `Token generated on ${new Date(
-                      record.tokenGeneratedDate
-                    ).toLocaleDateString()}`
-                  : record.generatedToken || "Generate a cash token"}
-              </button>
-            </Tooltip>
-          </div>
-        </div>
-      ),
-    },
-  ];
 
   const handleCopyReferralID = () => {
     if (!referralID) return;
@@ -371,20 +240,18 @@ const CustomerReferred = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table
-          dataSource={data}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-          bordered={false}
-          size="small"
-          rowClassName="custom-row"
-          components={components}
-          className="custom-table"
-          rowKey="id"
-          scroll={{ x: "max-content" }}
-        />
-      </div>
+      <CustomerReferredTableColumn
+        data={data}
+        isLoading={false}
+        isFetching={false}
+        pagination={{ current: 1, pageSize: 10, total: data.length }}
+        onPaginationChange={(page, pageSize) => {
+          console.log("Page changed:", page, pageSize);
+        }}
+        onAcknowledge={handleAcknowledge}
+        onToggleStatus={handleToggleUserStatus}
+        onGenerateToken={handleGenerateToken}
+      />
 
       {/* New Campaign Modal */}
       <Modal
