@@ -103,20 +103,22 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </Link>
       ),
     },
-    {
-      key: "/promotion-management",
-      icon: renderIcon(PromotionManagement, "/promotion-management"),
-      label: (
-        <Link to="/promotion-management">
-          {collapsed ? "" : "Promotion Management"}
-        </Link>
-      ),
-    },
+    // {
+    //   key: "/promotion-management",
+    //   icon: renderIcon(PromotionManagement, "/promotion-management"),
+    //   label: (
+    //     <Link to="/promotion-management">
+    //       {collapsed ? "" : "Promotion Management"}
+    //     </Link>
+    //   ),
+    // },
     {
       key: "/sales-rep-portal",
       icon: renderIcon(SalesRep, "/sales-rep-portal"),
       label: (
-        <Link to="/sales-rep-portal">{collapsed ? "" : "Sales Rep Portal"}</Link>
+        <Link to="/sales-rep-portal">
+          {collapsed ? "" : "Sales Rep Portal"}
+        </Link>
       ),
     },
     {

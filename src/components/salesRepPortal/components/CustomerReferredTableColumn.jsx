@@ -25,12 +25,12 @@ const CustomerReferredTableColumn = ({
       key: "phoneNumber",
       align: "center",
     },
-    {
-      title: "Sales Rep",
-      dataIndex: "salesRep",
-      key: "salesRep",
-      align: "center",
-    },
+    // {
+    //   title: "Sales Rep",
+    //   dataIndex: "salesRep",
+    //   key: "salesRep",
+    //   align: "center",
+    // },
     { title: "Email", dataIndex: "email", key: "email", align: "center" },
     {
       title: "Payment Status",
