@@ -1,75 +1,62 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "antd";
 import Swal from "sweetalert2";
 import NewCampaign from "../../promotionManagement/components/NewCampaing.jsx";
 import { CopyOutlined } from "@ant-design/icons";
 import CustomerReferredTableColumn from "./CustomerReferredTableColumn.jsx";
+import { useGetSalesRepDataQuery } from "../../../redux/apiSlices/salesRepSlice";
 
 const CustomerReferred = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      customerName: "John Doe",
-      phoneNumber: "123-456-7890",
-      email: "example@mail.com",
-      salesRep: "Rep 1",
-      paymentStatus: "Paid",
-      actionStatus: "Inactive",
-      status: "active",
-      statusProgress: 0, // 0 = only Acknowledge, 1 = Activate, 2 = Generate Token
-      acknowledgeDate: null, // Added to store acknowledge date
-      generatedToken: "", // Added to store generated token
-      activateDate: null, // Added to store activate date
-      tokenGeneratedDate: null, // Added to store token generated date
-    },
-    {
-      id: 2,
-      customerName: "Jane Smith",
-      phoneNumber: "234-567-8901",
-      email: "jane.smith@mail.com",
-      salesRep: "Rep 2",
-      paymentStatus: "Unpaid",
-      actionStatus: "Inactive",
-      status: "inactive",
-      statusProgress: 0,
-      acknowledgeDate: null,
-      generatedToken: "",
-      activateDate: null,
-      tokenGeneratedDate: null,
-    },
-    {
-      id: 3,
-      customerName: "Alice Johnson",
-      phoneNumber: "345-678-9012",
-      email: "alice.johnson@mail.com",
-      salesRep: "Rep 3",
-      paymentStatus: "Paid",
-      actionStatus: "Active",
-      status: "active",
-      statusProgress: 2,
-      acknowledgeDate: "2025-09-20", // Sample date
-      generatedToken: "ABC12345",
-      activateDate: "2025-09-18", // Sample date
-      tokenGeneratedDate: "2025-09-20", // Sample date
-    },
-    {
-      id: 4,
-      customerName: "Bob Brown",
-      phoneNumber: "456-789-0123",
-      email: "bob.brown@mail.com",
-      salesRep: "Rep 4",
-      paymentStatus: "Paid",
-      actionStatus: "Inactive",
-      status: "inactive",
-      statusProgress: 1,
-      acknowledgeDate: "2025-09-15", // Sample date
-      generatedToken: "",
-      activateDate: null,
-      tokenGeneratedDate: null,
-    },
-  ]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [rows, setRows] = useState([]);
 
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetSalesRepDataQuery({ page, limit: pageSize });
+
+  // Normalize API data into table rows
+  useEffect(() => {
+    const items = response?.data || [];
+    const mappedRows = items.map((item, index) => {
+      const customer = item.customerId || {};
+      const hasToken = Boolean(item.token);
+      const hasAcknowledged = Boolean(item.acknowledged);
+      const statusProgress = hasToken ? 2 : hasAcknowledged ? 1 : 0;
+
+      return {
+        recordId: item._id,
+        id: index + 1 + (page - 1) * pageSize,
+        customerName: customer.firstName || "-",
+        phoneNumber: customer.phone || "-",
+        email: customer.email || "-",
+        salesRep: customer.salesRep || "-",
+        paymentStatus: item.paymentStatus
+          ? `${item.paymentStatus
+              .charAt(0)
+              .toUpperCase()}${item.paymentStatus.slice(1)}`
+          : "-",
+        actionStatus: customer.status === "active" ? "Active" : "Inactive",
+        status: customer.status || "inactive",
+        statusProgress,
+        acknowledgeDate: item.acknowledgeDate
+          ? new Date(item.acknowledgeDate).toLocaleDateString()
+          : null,
+        generatedToken: item.token || "",
+        activateDate: null,
+        tokenGeneratedDate: item.tokenGenerateDate
+          ? new Date(item.tokenGenerateDate).toLocaleDateString()
+          : null,
+        acknowledged: hasAcknowledged,
+      };
+    });
+
+    setRows(mappedRows);
+  }, [response, page, pageSize]);
+
   const [isNewCampaignModalVisible, setIsNewCampaignModalVisible] =
     useState(false);
   const [isCashTokenModalVisible, setIsCashTokenModalVisible] = useState(false);
@@ -77,36 +64,30 @@ const CustomerReferred = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [referralID, setReferralID] = useState("ANDREW856 D");
 
-  // Handle Acknowledge Cash Payment
+  // Handle Acknowledge Cash Payment (local UI update)
   const handleAcknowledge = (record) => {
     setSelectedRecord(record);
-    setIsViewModalVisible(true);
 
-    // Update record with acknowledge date and progress status
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === record.id
+    setRows((prev) =>
+      prev.map((item) =>
+        item.recordId === record.recordId
           ? {
               ...item,
-              statusProgress: 1,
+              statusProgress: Math.max(item.statusProgress, 1),
               acknowledgeDate: new Date().toLocaleDateString(),
+              acknowledged: true,
             }
           : item
       )
     );
   };
 
-  const handleCloseViewModal = () => {
-    setIsViewModalVisible(false);
-    setSelectedRecord(null);
-  };
-
   const handleAddCampaign = (newCampaign) => {
-    setData((prev) => [
+    setRows((prev) => [
       ...prev,
       {
         id: prev.length + 1,
-        status: "Active",
+        status: "active",
         statusProgress: 0,
         ...newCampaign,
       },
@@ -127,14 +108,14 @@ const CustomerReferred = () => {
     const token = Math.random().toString(36).substring(2, 10).toUpperCase();
     setGeneratedToken(token);
 
-    // Set generated token in the selected record
-    setData((prevData) =>
+    setRows((prevData) =>
       prevData.map((item) =>
-        item.id === record.id
+        item.recordId === record.recordId
           ? {
               ...item,
               generatedToken: token,
               tokenGeneratedDate: new Date().toLocaleDateString(),
+              statusProgress: 2,
             }
           : item
       )
@@ -173,14 +154,14 @@ const CustomerReferred = () => {
         : "Yes, activate",
     }).then((result) => {
       if (result.isConfirmed) {
-        setData((prevData) =>
+        setRows((prevData) =>
           prevData.map((item) =>
-            item.id === record.id
+            item.recordId === record.recordId
               ? {
                   ...item,
                   status: isCurrentlyActive ? "inactive" : "active",
                   actionStatus: isCurrentlyActive ? "Inactive" : "Active",
-                  statusProgress: 2, // Generate Token enabled
+                  statusProgress: Math.max(item.statusProgress, 2),
                   activateDate: new Date().toLocaleDateString(),
                 }
               : item
@@ -241,12 +222,17 @@ const CustomerReferred = () => {
       </div>
 
       <CustomerReferredTableColumn
-        data={data}
-        isLoading={false}
-        isFetching={false}
-        pagination={{ current: 1, pageSize: 10, total: data.length }}
-        onPaginationChange={(page, pageSize) => {
-          console.log("Page changed:", page, pageSize);
+        data={rows}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        pagination={{
+          current: response?.pagination?.page || page,
+          pageSize: response?.pagination?.limit || pageSize,
+          total: response?.pagination?.total || rows.length,
+        }}
+        onPaginationChange={(nextPage, nextPageSize) => {
+          setPage(nextPage);
+          setPageSize(nextPageSize);
         }}
         onAcknowledge={handleAcknowledge}
         onToggleStatus={handleToggleUserStatus}
