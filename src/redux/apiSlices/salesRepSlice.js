@@ -19,7 +19,33 @@ export const salesRepApi = api.injectEndpoints({
       transformResponse: (response) => response,
       providesTags: ["SalesRep"],
     }),
+
+    // ---------------------------------------
+    // ACKNOWLEDGE - Mark referral as acknowledged
+    // ---------------------------------------
+    acknowledgeSalesRep: builder.mutation({
+      query: (customerId) => ({
+        url: `/sales-rep/acknowledge/users/${customerId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["SalesRep"],
+    }),
+
+    // ---------------------------------------
+    // GENERATE TOKEN - Generate cash token for referral
+    // ---------------------------------------
+    generateSalesRepToken: builder.mutation({
+      query: (customerId) => ({
+        url: `/sales-rep/token/users/${customerId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["SalesRep"],
+    }),
   }),
 });
 
-export const { useGetSalesRepDataQuery } = salesRepApi;
+export const { 
+  useGetSalesRepDataQuery,
+  useAcknowledgeSalesRepMutation,
+  useGenerateSalesRepTokenMutation,
+} = salesRepApi;

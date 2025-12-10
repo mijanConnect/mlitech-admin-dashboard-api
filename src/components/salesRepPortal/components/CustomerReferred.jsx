@@ -4,7 +4,11 @@ import Swal from "sweetalert2";
 import NewCampaign from "../../promotionManagement/components/NewCampaing.jsx";
 import { CopyOutlined } from "@ant-design/icons";
 import CustomerReferredTableColumn from "./CustomerReferredTableColumn.jsx";
-import { useGetSalesRepDataQuery } from "../../../redux/apiSlices/salesRepSlice";
+import {
+  useGetSalesRepDataQuery,
+  useAcknowledgeSalesRepMutation,
+  useGenerateSalesRepTokenMutation,
+} from "../../../redux/apiSlices/salesRepSlice";
 
 const CustomerReferred = () => {
   const [page, setPage] = useState(1);
@@ -18,6 +22,11 @@ const CustomerReferred = () => {
     error,
   } = useGetSalesRepDataQuery({ page, limit: pageSize });
 
+  const [acknowledgeSalesRep, { isLoading: isAcknowledging }] =
+    useAcknowledgeSalesRepMutation();
+  const [generateSalesRepToken, { isLoading: isGeneratingToken }] =
+    useGenerateSalesRepTokenMutation();
+
   // Normalize API data into table rows
   useEffect(() => {
     const items = response?.data || [];
@@ -30,6 +39,7 @@ const CustomerReferred = () => {
       return {
         recordId: item._id,
         id: index + 1 + (page - 1) * pageSize,
+        customerId: customer._id,
         customerName: customer.firstName || "-",
         phoneNumber: customer.phone || "-",
         email: customer.email || "-",
@@ -64,22 +74,39 @@ const CustomerReferred = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [referralID, setReferralID] = useState("ANDREW856 D");
 
-  // Handle Acknowledge Cash Payment (local UI update)
-  const handleAcknowledge = (record) => {
-    setSelectedRecord(record);
+  // Handle Acknowledge Cash Payment - Call API
+  const handleAcknowledge = async (record) => {
+    try {
+      await acknowledgeSalesRep(record.customerId).unwrap();
 
-    setRows((prev) =>
-      prev.map((item) =>
-        item.recordId === record.recordId
-          ? {
-              ...item,
-              statusProgress: Math.max(item.statusProgress, 1),
-              acknowledgeDate: new Date().toLocaleDateString(),
-              acknowledged: true,
-            }
-          : item
-      )
-    );
+      // Update local state after successful API call
+      setRows((prev) =>
+        prev.map((item) =>
+          item.customerId === record.customerId
+            ? {
+                ...item,
+                statusProgress: Math.max(item.statusProgress, 1),
+                acknowledgeDate: new Date().toLocaleDateString(),
+                acknowledged: true,
+              }
+            : item
+        )
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Acknowledged!",
+        text: "Cash payment acknowledged successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to acknowledge payment.",
+      });
+    }
   };
 
   const handleAddCampaign = (newCampaign) => {
@@ -102,25 +129,35 @@ const CustomerReferred = () => {
     });
   };
 
-  // Generate Cash Token
-  const handleGenerateToken = (record) => {
-    setSelectedRecord(record);
-    const token = Math.random().toString(36).substring(2, 10).toUpperCase();
-    setGeneratedToken(token);
+  // Generate Cash Token - Call API
+  const handleGenerateToken = async (record) => {
+    try {
+      const response = await generateSalesRepToken(record.customerId).unwrap();
+      const token = response?.data?.token || "TOKEN_GENERATED";
 
-    setRows((prevData) =>
-      prevData.map((item) =>
-        item.recordId === record.recordId
-          ? {
-              ...item,
-              generatedToken: token,
-              tokenGeneratedDate: new Date().toLocaleDateString(),
-              statusProgress: 2,
-            }
-          : item
-      )
-    );
-    setIsCashTokenModalVisible(true);
+      setSelectedRecord(record);
+      setGeneratedToken(token);
+
+      setRows((prevData) =>
+        prevData.map((item) =>
+          item.customerId === record.customerId
+            ? {
+                ...item,
+                generatedToken: token,
+                tokenGeneratedDate: new Date().toLocaleDateString(),
+                statusProgress: 2,
+              }
+            : item
+        )
+      );
+      setIsCashTokenModalVisible(true);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to generate token.",
+      });
+    }
   };
 
   // Then, update handleConfirmToken:
