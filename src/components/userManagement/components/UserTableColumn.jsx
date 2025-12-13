@@ -15,7 +15,7 @@ const UserTableColumn = ({
   onStatusChange,
 }) => {
   const columns = [
-    { title: "SL", dataIndex: "id", key: "id", align: "center" },
+    { title: "SL", dataIndex: "si", key: "si", align: "center" },
     {
       title: "User Name",
       dataIndex: "firstName",
@@ -75,7 +75,7 @@ const UserTableColumn = ({
                   confirmButtonText: "Yes, delete it!",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    onDelete(record.id);
+                    onDelete(record.recordId);
                     Swal.fire({
                       title: "Deleted!",
                       text: "Your record has been deleted.",
@@ -109,16 +109,10 @@ const UserTableColumn = ({
                 confirmButtonText: "Yes, change it!",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  onStatusChange(record.id, checked ? "Active" : "Inactive");
-                  Swal.fire({
-                    title: "Updated!",
-                    text: `Status has been changed to ${
-                      checked ? "Active" : "Inactive"
-                    }.`,
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false,
-                  });
+                  onStatusChange(
+                    record.recordId,
+                    checked ? "Active" : "Inactive"
+                  );
                 }
               });
             }}

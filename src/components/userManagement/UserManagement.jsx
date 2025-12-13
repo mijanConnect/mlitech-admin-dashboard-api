@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Button, Modal, Form, Input, Select } from "antd";
 import Swal from "sweetalert2";
 import AddNewUserModal from "./components/AddNewUserModal";
@@ -35,8 +35,6 @@ const UserManagement = () => {
   } = useGetUserListQuery(queryParams);
 
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
-  const [updateApprovalStatus, { isLoading: isUpdatingApproval }] =
-    useUpdateUserApprovalStatusMutation();
   const [updateUserStatus, { isLoading: isUpdatingStatus }] =
     useUpdateUserStatusMutation();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
@@ -51,7 +49,7 @@ const UserManagement = () => {
       recordId: item._id,
       si: index + 1 + (page - 1) * limit,
       id: item.userId,
-      firstName: item.firstName + " " + item.lastName || "-",
+      firstName: item.firstName || "-",
       email: item.email || "-",
       password: "******",
       phone: item.phone || "-",
