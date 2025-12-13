@@ -12,7 +12,7 @@ import {
 } from "../../redux/apiSlices/customerSlice";
 import CustomerTableColumn from "./components/CustomerTableColumn";
 
-const CustomerManagement = () => {
+const CustomerManagement2 = () => {
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -307,4 +307,4 @@ const CustomerManagement = () => {
   );
 };
 
-export default CustomerManagement;
+export default CustomerManagement2;

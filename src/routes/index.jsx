@@ -16,7 +16,6 @@ import PackagesPlans from "../components/subscription/Subscription";
 import Contact from "../Pages/Dashboard/Contact";
 import ResetSuccess from "../Pages/Auth/ResetSuccess";
 import SetPassword from "../Pages/Auth/SetPassword";
-import CustomerManagement from "../components/customerManagement/customerManagement";
 import TierSystem from "../components/TierSystem/TierSystem";
 import PromotionManagement from "../components/promotionManagement/PromotionManagement";
 import SalesRepPortal from "../components/salesRepPortal/SalesRepPortal";
@@ -25,7 +24,8 @@ import ReportingAnalytics from "../components/reportingAnalytics/ReportingAnalyt
 import PushNotifications from "../components/pushNotifications/PushNotifications";
 import PrivateRoute from "./ProtectedRoute";
 import MerchantManagement from "../components/MerchantManagement/MerchantManagement";
-import UserManagement from "../components/userManagement/userManagement";
+import UserManagement from "../components/userManagement/UserManagement2";
+import CustomerManagement2 from "../components/customerManagement/CustomerManagement2";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/customer-management",
-        element: <CustomerManagement />,
+        element: <CustomerManagement2 />,
       },
       {
         path: "/tier-system",
