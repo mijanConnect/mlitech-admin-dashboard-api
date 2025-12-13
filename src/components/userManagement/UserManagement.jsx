@@ -1,42 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button, Modal, Form, Input, Select } from "antd";
 import Swal from "sweetalert2";
 import AddNewUserModal from "./components/AddNewUserModal";
 import UserTableColumn from "./components/UserTableColumn";
+import {
+  useDeleteUserMutation,
+  useGetUserListQuery,
+  useUpdateUserApprovalStatusMutation,
+  useUpdateUserStatusMutation,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+} from "../../redux/apiSlices/userManagaementSlice";
 
 const { Option } = Select;
 
 const UserManagement = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      name: "Alice Johnson",
-      email: "alice@email.com",
-      password: "123456",
-      phone: "+1234567890",
-      role: "Admin",
-      createdAt: "2025-08-01",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      email: "john@email.com",
-      password: "123456",
-      phone: "+9876543210",
-      role: "User",
-      createdAt: "2025-08-05",
-      status: "Inactive",
-    },
-  ]);
+  const [searchText, setSearchText] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
-  const [roles, setRoles] = useState(["Admin", "User"]); // Default roles
+  const queryParams = [
+    { name: "page", value: page },
+    { name: "limit", value: limit },
+  ];
+  if (searchText.trim()) {
+    queryParams.push({ name: "searchTerm", value: searchText.trim() });
+  }
+
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetUserListQuery(queryParams);
+
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const [updateApprovalStatus, { isLoading: isUpdatingApproval }] =
+    useUpdateUserApprovalStatusMutation();
+  const [updateUserStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateUserStatusMutation();
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+
+  console.log(response);
+
+  const tableData = useMemo(() => {
+    const items = response?.data || [];
+    return items.map((item, index) => ({
+      key: item._id,
+      recordId: item._id,
+      si: index + 1 + (page - 1) * limit,
+      id: item.userId,
+      firstName: item.firstName + " " + item.lastName || "-",
+      email: item.email || "-",
+      password: "******",
+      phone: item.phone || "-",
+      role: item.role || "-",
+      createdAt: item.createdAt
+        ? new Date(item.createdAt).toLocaleDateString()
+        : "-",
+      status: item.status === "active" ? "Active" : "Inactive",
+      raw: item,
+    }));
+  }, [response, page, limit]);
+
+  const paginationData = {
+    pageSize: limit,
+    total: response?.pagination?.total || 0,
+    current: page,
+  };
+
+  const [roles] = useState(["ADMIN", "ADMIN_REP", "ADMIN_SEL"]);
 
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
 
   const [isRoleModalVisible, setIsRoleModalVisible] = useState(false);
   const [roleForm] = Form.useForm();
@@ -70,57 +107,80 @@ const UserManagement = () => {
   };
 
   // Handle Add/Edit User submission
-  const handleSubmitUser = (values) => {
-    if (editingUser) {
-      // Update existing user
-      setData((prev) =>
-        prev.map((item) =>
-          item.id === editingUser.id ? { ...item, ...values } : item
-        )
-      );
+  const handleSubmitUser = async (values) => {
+    try {
+      if (editingUser) {
+        // Update existing user
+        await updateUser({ id: editingUser.recordId, ...values }).unwrap();
+        Swal.fire({
+          title: "Updated!",
+          text: "User details have been updated successfully.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        // Add new user
+        await createUser(values).unwrap();
+        Swal.fire({
+          title: "User Added!",
+          text: `${values.name} has been added successfully.`,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+      handleCloseUserModal();
+    } catch (error) {
       Swal.fire({
-        title: "Updated!",
-        text: "User details have been updated successfully.",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    } else {
-      // Add new user
-      const newUser = {
-        id: data.length + 1,
-        status: "Active",
-        createdAt: new Date().toISOString().split("T")[0],
-        ...values,
-      };
-      setData((prev) => [...prev, newUser]);
-      Swal.fire({
-        title: "User Added!",
-        text: `${values.name} has been added successfully.`,
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to save user.",
       });
     }
-    handleCloseUserModal();
   };
 
   // Handle delete user
-  const handleDeleteUser = (id) => {
-    setData(data.filter((item) => item.id !== id));
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUser(id).unwrap();
+      Swal.fire({
+        title: "Deleted!",
+        text: "User has been deleted successfully.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to delete user.",
+      });
+    }
   };
 
   // Handle status change
-  const handleStatusChange = (id, status) => {
-    setData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-  };
-
-  const paginationData = {
-    pageSize: pageSize,
-    total: data.length,
-    current: page,
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateUserStatus({
+        id,
+        status: status.toLowerCase(),
+      }).unwrap();
+      Swal.fire({
+        title: "Updated!",
+        text: `Status has been changed to ${status}.`,
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to update status.",
+      });
+    }
   };
 
   return (
@@ -143,13 +203,15 @@ const UserManagement = () => {
       </div>
 
       <UserTableColumn
-        data={data}
-        isLoading={false}
-        isFetching={false}
+        data={tableData}
+        isLoading={isLoading}
+        isFetching={isFetching}
         pagination={paginationData}
         onPaginationChange={(nextPage, nextPageSize) => {
           setPage(nextPage);
-          setPageSize(nextPageSize);
+          if (nextPageSize !== limit) {
+            setLimit(nextPageSize);
+          }
         }}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}

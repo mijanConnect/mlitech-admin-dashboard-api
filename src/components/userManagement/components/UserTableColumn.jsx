@@ -16,14 +16,19 @@ const UserTableColumn = ({
 }) => {
   const columns = [
     { title: "SL", dataIndex: "id", key: "id", align: "center" },
-    { title: "User Name", dataIndex: "name", key: "name", align: "center" },
-    { title: "Email", dataIndex: "email", key: "email", align: "center" },
     {
-      title: "Password",
-      dataIndex: "password",
-      key: "password",
+      title: "User Name",
+      dataIndex: "firstName",
+      key: "firstName",
       align: "center",
     },
+    { title: "Email", dataIndex: "email", key: "email", align: "center" },
+    // {
+    //   title: "Password",
+    //   dataIndex: "password",
+    //   key: "password",
+    //   align: "center",
+    // },
     {
       title: "Phone Number",
       dataIndex: "phone",

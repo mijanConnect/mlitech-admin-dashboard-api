@@ -44,7 +44,7 @@ const AddNewUserModal = ({
     >
       <Form form={form} layout="vertical" className="flex flex-col gap-4 mb-6">
         <Form.Item
-          name="name"
+          name="firstName"
           label="User Name"
           rules={[{ required: true, message: "Please enter name" }]}
         >
