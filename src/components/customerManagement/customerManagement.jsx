@@ -9,6 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   useGetCustomerProfileQuery,
   useDeleteCustomerMutation,
+  useUpdateCustomerStatusMutation,
 } from "../../redux/apiSlices/customerSlice";
 import CustomerTableColumn from "./components/CustomerTableColumn";
 
@@ -39,6 +40,9 @@ const CustomerManagement = () => {
 
   const [deleteCustomer, { isLoading: isDeleting }] =
     useDeleteCustomerMutation();
+
+  const [updateCustomerStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateCustomerStatusMutation();
 
   console.log(response);
 
@@ -160,12 +164,28 @@ const CustomerManagement = () => {
     });
   };
 
-  const handleStatusChange = (recordId, newStatus) => {
-    setTableData((prev) =>
-      prev.map((item) =>
-        item.id === recordId ? { ...item, status: newStatus } : item
-      )
-    );
+  const handleStatusChange = async (recordId, newStatus) => {
+    try {
+      const statusValue = newStatus === "Active" ? "active" : "inActive";
+      await updateCustomerStatus({
+        id: recordId,
+        status: statusValue,
+      }).unwrap();
+      Swal.fire({
+        title: "Updated!",
+        text: `Status has been changed to ${newStatus}.`,
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Status update failed", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.data?.message || "Failed to update status.",
+      });
+    }
   };
 
   // Sync URL params with state

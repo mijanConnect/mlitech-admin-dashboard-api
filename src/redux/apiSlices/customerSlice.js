@@ -31,7 +31,18 @@ export const customerApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Customer"],
     }),
+    // ---------------------------------------
+    // TOGGLE customer STATUS
+    // ---------------------------------------
+    updateCustomerStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/customers/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["Customer"],
+    }),
   }),
 });
 
-export const { useGetCustomerProfileQuery, useDeleteCustomerMutation } = customerApi;
+export const { useGetCustomerProfileQuery, useDeleteCustomerMutation, useUpdateCustomerStatusMutation } = customerApi;

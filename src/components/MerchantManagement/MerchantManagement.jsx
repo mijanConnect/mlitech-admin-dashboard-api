@@ -56,7 +56,7 @@ const MerchantManagement = () => {
       businessName: item.businessName || "-",
       phone: item.phone || "-",
       email: item.email || "-",
-      location: item.location || "-",
+      location: item.address || "-",
       salesRep: item.salesRep || "-",
       totalSales: item.totalSales || 0,
       totalPointsEarned: item.totalPointsEarned || 0,
@@ -110,7 +110,7 @@ const MerchantManagement = () => {
           name: values.name || "—",
           businessName: values.businessName || "—",
           phone: values.phone || "—",
-          location: values.location || "—",
+          location: values.address || "—",
           feedback: 0,
         };
         setData((prev) => [...prev, newMerchant]);

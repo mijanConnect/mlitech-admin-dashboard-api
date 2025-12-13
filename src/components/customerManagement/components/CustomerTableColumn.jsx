@@ -124,16 +124,7 @@ const CustomerTableColumn = ({
                 confirmButtonText: "Yes, change it!",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  onStatusChange(record.id, checked ? "Active" : "Inactive");
-                  Swal.fire({
-                    title: "Updated!",
-                    text: `Status has been changed to ${
-                      checked ? "Active" : "Inactive"
-                    }.`,
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false,
-                  });
+                  onStatusChange(record.recordId, checked ? "Active" : "Inactive");
                 }
               });
             }}
