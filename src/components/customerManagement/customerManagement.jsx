@@ -1,4 +1,3 @@
-"use client";
 import { Button, Form, Input } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
