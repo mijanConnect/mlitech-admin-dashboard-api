@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Table, Modal, Tooltip, Spin } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MarchantIcon from "../../assets/exclemetion.png";
 import { useGetAuditLogsQuery } from "../../redux/apiSlices/auditLogSlice";
 
@@ -35,12 +35,15 @@ const components = {
 };
 
 const AuditLogs = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const navigate = useNavigate();
+
+  // Get pagination from URL or use defaults
+  const page = parseInt(searchParams.get("page")) || 1;
+  const pageSize = parseInt(searchParams.get("limit")) || 10;
 
   // Fetch audit logs from API
   const {
@@ -139,8 +142,7 @@ const AuditLogs = () => {
               showTotal: (total) => `Total ${total} items`,
               showSizeChanger: true,
               onChange: (newPage, newPageSize) => {
-                setPage(newPage);
-                setPageSize(newPageSize);
+                setSearchParams({ page: newPage, limit: newPageSize });
               },
             }}
             bordered={false}
