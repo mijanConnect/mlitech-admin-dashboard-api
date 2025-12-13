@@ -78,13 +78,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </Link>
       ),
     },
-    // {
-    //   key: "/tier-system",
-    //   icon: renderIcon(People, "/tier-system"),
-    //   label: (
-    //     <Link to="/tier-system">{collapsed ? "" : "Point & Tier System"}</Link>
-    //   ),
-    // },
+    {
+      key: "/tier-system",
+      icon: renderIcon(People, "/tier-system"),
+      label: (
+        <Link to="/tier-system">{collapsed ? "" : "Point & Tier System"}</Link>
+      ),
+    },
     {
       key: "/reporting-analytics",
       icon: renderIcon(Rewords, "/reporting-analytics"),
@@ -103,15 +103,15 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </Link>
       ),
     },
-    // {
-    //   key: "/promotion-management",
-    //   icon: renderIcon(PromotionManagement, "/promotion-management"),
-    //   label: (
-    //     <Link to="/promotion-management">
-    //       {collapsed ? "" : "Promotion Management"}
-    //     </Link>
-    //   ),
-    // },
+    {
+      key: "/promotion-management",
+      icon: renderIcon(PromotionManagement, "/promotion-management"),
+      label: (
+        <Link to="/promotion-management">
+          {collapsed ? "" : "Promotion Management"}
+        </Link>
+      ),
+    },
     {
       key: "/sales-rep-portal",
       icon: renderIcon(SalesRep, "/sales-rep-portal"),

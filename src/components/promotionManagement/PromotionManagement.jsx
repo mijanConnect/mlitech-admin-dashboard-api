@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Button,
@@ -13,7 +13,6 @@ import {
 import { FaEdit } from "react-icons/fa";
 import { IoEyeSharp, IoArrowBack } from "react-icons/io5";
 import Swal from "sweetalert2";
-import MarchantIcon from "../../assets/marchant.png";
 import NewCampaign from "../promotionManagement/components/NewCampaing.jsx";
 import dayjs from "dayjs"; // ✅ AntD v5 uses Dayjs
 

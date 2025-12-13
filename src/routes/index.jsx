@@ -21,11 +21,11 @@ import TierSystem from "../components/TierSystem/TierSystem";
 import PromotionManagement from "../components/promotionManagement/PromotionManagement";
 import SalesRepPortal from "../components/salesRepPortal/SalesRepPortal";
 import AuditLogs from "../components/auditLogs/AuditLogs";
-import LoginCredentials from "../components/loginCredentials/LoginCredentials";
 import ReportingAnalytics from "../components/reportingAnalytics/ReportingAnalytics";
 import PushNotifications from "../components/pushNotifications/PushNotifications";
 import PrivateRoute from "./ProtectedRoute";
 import MerchantManagement from "../components/MerchantManagement/MerchantManagement";
+import UserManagement from "../components/userManagement/userManagement";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/user-management",
-        element: <LoginCredentials />,
+        element: <UserManagement />,
       },
       {
         path: "/reporting-analytics",
