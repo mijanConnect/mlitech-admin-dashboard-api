@@ -85,6 +85,7 @@ export const api = createApi({
     "Statistics",
     "SalesRep",
     "User",
+    "AuditLog",
   ],
   endpoints: () => ({}),
 });

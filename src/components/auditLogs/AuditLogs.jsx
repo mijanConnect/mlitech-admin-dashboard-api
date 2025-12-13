@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Table, Modal, Tooltip } from "antd";
+import { useState, useMemo } from "react";
+import { Table, Modal, Tooltip, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import MarchantIcon from "../../assets/exclemetion.png";
+import { useGetAuditLogsQuery } from "../../redux/apiSlices/auditLogSlice";
 
 const components = {
   header: {
@@ -34,34 +35,36 @@ const components = {
 };
 
 const AuditLogs = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      timeStamp: "2023-10-01 12:00:00",
-      actionType: "Create",
-      user: "Admin",
-      details: "Created a new merchant account",
-    },
-    {
-      id: 2,
-      timeStamp: "2023-10-01 12:00:00",
-      actionType: "Create",
-      user: "Admin",
-      details: "Created a new merchant account",
-    },
-    {
-      id: 3,
-      timeStamp: "2023-10-01 12:00:00",
-      actionType: "Create",
-      user: "Admin",
-      details: "Created a new merchant account",
-    },
-  ]);
-
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const navigate = useNavigate();
+
+  // Fetch audit logs from API
+  const {
+    data: apiData,
+    isLoading,
+    isFetching,
+  } = useGetAuditLogsQuery({
+    page,
+    limit: pageSize,
+  });
+
+  // Transform API data to table format
+  const tableData = useMemo(() => {
+    if (!apiData?.data?.data) return [];
+
+    return apiData.data.data.map((item, index) => ({
+      id: index + 1 + (page - 1) * pageSize,
+      recordId: item._id,
+      timeStamp: new Date(item.timestamp).toLocaleString(),
+      actionType: item.actionType,
+      user: item.user,
+      details: item.details,
+    }));
+  }, [apiData, page, pageSize]);
 
   const showViewModal = (record) => {
     setSelectedRecord(record);
@@ -125,17 +128,29 @@ const AuditLogs = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <Table
-          dataSource={data}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-          bordered={false}
-          size="small"
-          rowClassName="custom-row"
-          components={components}
-          className="custom-table"
-          scroll={{ x: "max-content" }}
-        />
+        <Spin spinning={isLoading || isFetching}>
+          <Table
+            dataSource={tableData}
+            columns={columns}
+            pagination={{
+              current: page,
+              pageSize: pageSize,
+              total: apiData?.data?.meta?.total || 0,
+              showTotal: (total) => `Total ${total} items`,
+              showSizeChanger: true,
+              onChange: (newPage, newPageSize) => {
+                setPage(newPage);
+                setPageSize(newPageSize);
+              },
+            }}
+            bordered={false}
+            size="small"
+            rowClassName="custom-row"
+            components={components}
+            className="custom-table"
+            scroll={{ x: "max-content" }}
+          />
+        </Spin>
       </div>
 
       {/* View Details Modal */}
